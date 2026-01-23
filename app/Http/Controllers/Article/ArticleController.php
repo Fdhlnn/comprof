@@ -22,4 +22,25 @@ class ArticleController extends Controller
         ]);
     }
 
+    public function edit(Article $article)
+    {
+        return inertia::render('Articles/Edit', [
+            'article' => $article,
+        ]);
+    }
+
+    public function update(Request $request, Article $article)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'thumbnail' => 'nullable|string|max:255',
+            'author' => 'required|string|max:255',
+        ]);
+
+        $article->update($validated);
+
+        return redirect()->route('articles.index')->with('success', 'Article updated successfully.');
+    }
+
 }
