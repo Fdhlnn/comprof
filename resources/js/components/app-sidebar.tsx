@@ -10,17 +10,43 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { dashboard, products, articles, clients, gallery, events } from '@/routes';
 import type { NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
+import { Avatar } from '@radix-ui/react-avatar';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Products',
+        href: products(),
+        icon: Folder,
+    },
+    {
+        title: 'Clients',
+        href: clients(),
+        icon: Folder,
+    },
+    {
+        title: 'Articles',
+        href: articles(),
+        icon: BookOpen,
+    },
+    {
+        title: 'Gallery',
+        href: gallery(),
+        icon: Folder,
+    },
+    {
+        title: 'Events',
+        href: events(),
+        icon: Folder,
     },
 ];
 
