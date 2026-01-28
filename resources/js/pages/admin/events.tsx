@@ -18,7 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Event',
-        href: '/event',
+        href: "/admin/events",
     },
 ];
 

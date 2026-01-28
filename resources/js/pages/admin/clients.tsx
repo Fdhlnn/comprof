@@ -24,7 +24,7 @@ import {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Clients',
-        href: '/clients',
+        href: "/admin/clients",
     },
 ];
 

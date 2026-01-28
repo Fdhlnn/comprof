@@ -20,32 +20,32 @@ import { Avatar } from '@radix-ui/react-avatar';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard(),
+        href: "/admin/dashboard",
         icon: LayoutGrid,
     },
     {
         title: 'Products',
-        href: products(),
+        href: "/admin/products",
         icon: Folder,
     },
     {
         title: 'Clients',
-        href: clients(),
+        href: "/admin/clients",
         icon: Folder,
     },
     {
         title: 'Articles',
-        href: articles(),
+        href: "/admin/articles",
         icon: BookOpen,
     },
     {
         title: 'Gallery',
-        href: gallery(),
+        href: "/admin/gallery",
         icon: Folder,
     },
     {
         title: 'Events',
-        href: events(),
+        href: "/admin/events",
         icon: Folder,
     },
 ];

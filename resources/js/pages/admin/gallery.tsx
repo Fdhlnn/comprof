@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Gallery', href: '/gallery' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Gallery', href: "/admin/gallery" }];
 
 type GalleryItem = {
     id: number;

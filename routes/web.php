@@ -11,23 +11,23 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
+    Route::get('/dashboard', function () {
+        return Inertia::render('admin/dashboard');
     })->name('dashboard');
-    Route::get('products', function () {
-        return Inertia::render('products');
+    Route::get('/products', function () {
+        return Inertia::render('admin/products');
     })->name('products');
-    Route::get('articles', function () {
-        return Inertia::render('articles');
+    Route::get('/articles', function () {
+        return Inertia::render('admin/articles');
     })->name('articles');
-    Route::get('clients', function () {
-        return Inertia::render('clients');
+    Route::get('/clients', function () {
+        return Inertia::render('admin/clients');
     })->name('clients');
-    Route::get('gallery', function () {
-        return Inertia::render('gallery');
+    Route::get('/gallery', function () {
+        return Inertia::render('admin/gallery');
     })->name('gallery');
-    Route::get('events', function () {
-        return Inertia::render('events');
+    Route::get('/events', function () {
+        return Inertia::render('admin/events');
     })->name('events');
 });
 

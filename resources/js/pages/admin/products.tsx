@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Products',
-        href: products().url,
+        href: "/admin/products",
     },
 ];
 
