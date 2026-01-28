@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Gallery;
+namespace App\Http\Controllers\Dashboard;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class GalleryController extends Controller
+class DashboardController extends Controller
 {
     public function index()
     {
-        return inertia::render('Gallery/Index');
+        return inertia::render('Dashboard/Index');
     }
+
 }
