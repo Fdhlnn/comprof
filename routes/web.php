@@ -10,6 +10,21 @@ Route::get('/home', function () {
     ]);
 })->name('home');
 
+Route::middleware('guest')->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('comprof/home');
+    })->name('home');
+
+    Route::get('/about', fn() => Inertia::render('About'));
+    Route::get('/events', fn() => Inertia::render('Events'));
+    Route::get('/articles', fn() => Inertia::render('Articles'));
+    Route::get('/gallery', fn() => Inertia::render('Gallery'));
+    Route::get('/contact', fn() => Inertia::render('Contact'));
+
+    Route::get('/login', fn() => Inertia::render('Auth/Login'))
+        ->name('login');
+});
+
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('admin/dashboard');
