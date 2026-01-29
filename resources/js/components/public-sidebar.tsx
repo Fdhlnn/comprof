@@ -1,7 +1,7 @@
 import { NavMain } from '@/components/nav-main';
 import {Sidebar,SidebarContent, SidebarHeader,} from '@/components/ui/sidebar';
 import { NavItem } from '@/types';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Box, Calendar, Folder, Image, ImageIcon, LayoutGrid, Users } from 'lucide-react';
 
 const mainNavItems: NavItem[] = [
     {
@@ -12,12 +12,12 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Products',
         href: '#',
-        icon: Folder,
+        icon: Box,
     },
     {
         title: 'Clients',
         href: '#',
-        icon: Folder,
+        icon: Users,
     },
     {
         title: 'Articles',
@@ -27,12 +27,12 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Gallery',
         href: '#',
-        icon: Folder,
+        icon: ImageIcon,
     },
     {
         title: 'Events',
         href: '#',
-        icon: Folder,
+        icon: Calendar,
     },
 ];
 
