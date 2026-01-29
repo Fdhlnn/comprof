@@ -15,11 +15,11 @@ Route::middleware('guest')->group(function () {
         return Inertia::render('comprof/home');
     })->name('home');
 
-    Route::get('/about', fn() => Inertia::render('About'));
-    Route::get('/events', fn() => Inertia::render('Events'));
-    Route::get('/articles', fn() => Inertia::render('Articles'));
-    Route::get('/gallery', fn() => Inertia::render('Gallery'));
-    Route::get('/contact', fn() => Inertia::render('Contact'));
+    Route::get('/about', fn() => Inertia::render('comprof/about-us'));
+    Route::get('/events', fn() => Inertia::render('comprof/events'));
+    Route::get('/articles', fn() => Inertia::render('comprof/articles'));
+    Route::get('/gallery', fn() => Inertia::render('comprof/gallery'));
+    Route::get('/contact', fn() => Inertia::render('comprof/contact'));
 
     Route::get('/login', fn() => Inertia::render('Auth/Login'))
         ->name('login');
