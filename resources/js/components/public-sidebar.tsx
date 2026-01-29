@@ -1,7 +1,7 @@
+import { BookOpen, Box, Calendar, ImageIcon, LayoutGrid, Users } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import {Sidebar,SidebarContent, SidebarHeader,} from '@/components/ui/sidebar';
-import { NavItem } from '@/types';
-import { BookOpen, Box, Calendar, Folder, Image, ImageIcon, LayoutGrid, Users } from 'lucide-react';
+import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
     {
