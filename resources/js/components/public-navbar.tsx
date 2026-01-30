@@ -34,6 +34,12 @@ export function AppNavbar() {
                     <Link href="/events" className="hover:text-neutral-300">
                         Events
                     </Link>
+                    <Link href="/products" className="hover:text-neutral-300">
+                        Products
+                    </Link>
+                    <Link href="/clients" className="hover:text-neutral-300">
+                        Clients
+                    </Link>
                     <Link href="/articles" className="hover:text-neutral-300">
                         Articles
                     </Link>
