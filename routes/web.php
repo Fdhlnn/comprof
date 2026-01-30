@@ -17,6 +17,7 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/about', fn() => Inertia::render('comprof/about-us'));
     Route::get('/events', fn() => Inertia::render('comprof/events'));
+    Route::get('/products', fn() => Inertia::render('comprof/products'));
     Route::get('/articles', fn() => Inertia::render('comprof/articles'));
     Route::get('/gallery', fn() => Inertia::render('comprof/gallery'));
     Route::get('/contact', fn() => Inertia::render('comprof/contact'));
