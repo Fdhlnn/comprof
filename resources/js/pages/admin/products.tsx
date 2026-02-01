@@ -1,7 +1,5 @@
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-
-/* shadcn/ui */
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -14,13 +12,6 @@ import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
-/* ================= HELPERS ================= */
-const formatRupiah = (value: number) => {
-    if (!value) return 'Rp 0';
-    return 'Rp ' + value.toLocaleString('id-ID');
-};
-
-/* ================= TYPES ================= */
 type Product = {
     id: number;
     name: string;
@@ -28,95 +19,67 @@ type Product = {
     image: string;
 };
 
-/* ================= BREADCRUMB ================= */
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Products', href: '/admin/products' },
 ];
 
-export default function Products() {
-    const [items, setItems] = useState<Product[]>([]);
+const formatRupiah = (value: number) => 'Rp ' + value.toLocaleString('id-ID');
 
+export default function Products({ products }: { products: Product[] }) {
     const [open, setOpen] = useState(false);
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editing, setEditing] = useState<Product | null>(null);
 
-    const [form, setForm] = useState({
+    const {
+        data,
+        setData,
+        post,
+        put,
+        delete: destroy,
+        reset,
+    } = useForm({
         name: '',
         price: 0,
         image: null as File | null,
-        preview: '',
     });
 
-    /* ================= HANDLERS ================= */
-    const resetForm = () => {
-        setForm({ name: '', price: 0, image: null, preview: '' });
-        setEditingId(null);
-    };
-
-    const handleOpenCreate = () => {
-        resetForm();
+    const openCreate = () => {
+        reset();
+        setEditing(null);
         setOpen(true);
     };
 
-    const handleOpenEdit = (product: Product) => {
-        setForm({
+    const openEdit = (product: Product) => {
+        setEditing(product);
+        setData({
             name: product.name,
             price: product.price,
             image: null,
-            preview: product.image,
         });
-        setEditingId(product.id);
         setOpen(true);
     };
 
-    const handleImageChange = (file?: File) => {
-        if (!file) return;
-        setForm({
-            ...form,
-            image: file,
-            preview: URL.createObjectURL(file),
-        });
-    };
-
-    const handleSubmit = () => {
-        if (!form.name || !form.price || !form.preview) return;
-
-        const payload: Product = {
-            id: editingId ?? Date.now(),
-            name: form.name,
-            price: form.price,
-            image: form.preview,
-        };
-
-        if (editingId) {
-            setItems((prev) =>
-                prev.map((item) => (item.id === editingId ? payload : item)),
-            );
+    const submit = () => {
+        if (editing) {
+            put(`/admin/products/${editing.id}`, {
+                onSuccess: () => setOpen(false),
+            });
         } else {
-            setItems((prev) => [...prev, payload]);
+            post('/admin/products', {
+                onSuccess: () => setOpen(false),
+            });
         }
-
-        setOpen(false);
-        resetForm();
     };
 
-    const handleDelete = (id: number) => {
-        if (!confirm('Hapus produk ini?')) return;
-        setItems((prev) => prev.filter((item) => item.id !== id));
-    };
-
-    /* ================= RENDER ================= */
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Products" />
 
-            <div className="flex flex-col gap-6 p-4">
-                {/* HEADER */}
+            <div className="space-y-6 p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Products</h1>
-                    <Button onClick={handleOpenCreate}>Add Product</Button>
+                    <Button onClick={openCreate}>Add Product</Button>
                 </div>
 
-                {/* TABLE */}
                 <div className="overflow-x-auto rounded-xl border">
                     <table className="w-full text-sm">
                         <thead className="bg-muted">
@@ -124,28 +87,27 @@ export default function Products() {
                                 <th className="px-4 py-3">Image</th>
                                 <th className="px-4 py-3 text-left">Name</th>
                                 <th className="px-4 py-3 text-left">Price</th>
-                                <th className="px-4 py-3 text-left">Action</th>
+                                <th className="px-4 py-3">Action</th>
                             </tr>
                         </thead>
-
                         <tbody>
-                            {items.map((item) => (
-                                <tr key={item.id} className="border-t">
+                            {products.map((p) => (
+                                <tr key={p.id} className="border-t">
                                     <td className="px-4 py-3">
                                         <img
-                                            src={item.image}
-                                            className="h-14 w-14 rounded-md object-cover"
+                                            src={`/storage/${p.image}`}
+                                            className="h-14 w-14 rounded object-cover"
                                         />
                                     </td>
-                                    <td className="px-4 py-3">{item.name}</td>
+                                    <td className="px-4 py-3">{p.name}</td>
                                     <td className="px-4 py-3">
-                                        {formatRupiah(item.price)}
+                                        {formatRupiah(p.price)}
                                     </td>
-                                    <td className="flex gap-2 px-4 py-3">
+                                    <td className="flex justify-center gap-2 px-4 py-3">
                                         <Button
                                             size="sm"
                                             variant="secondary"
-                                            onClick={() => handleOpenEdit(item)}
+                                            onClick={() => openEdit(p)}
                                         >
                                             Edit
                                         </Button>
@@ -153,7 +115,9 @@ export default function Products() {
                                             size="sm"
                                             variant="destructive"
                                             onClick={() =>
-                                                handleDelete(item.id)
+                                                destroy(
+                                                    `/admin/products/${p.id}`,
+                                                )
                                             }
                                         >
                                             Delete
@@ -161,17 +125,6 @@ export default function Products() {
                                     </td>
                                 </tr>
                             ))}
-
-                            {items.length === 0 && (
-                                <tr>
-                                    <td
-                                        colSpan={4}
-                                        className="px-4 py-6 text-center text-muted-foreground"
-                                    >
-                                        No products
-                                    </td>
-                                </tr>
-                            )}
                         </tbody>
                     </table>
                 </div>
@@ -181,52 +134,36 @@ export default function Products() {
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>
-                                {editingId ? 'Edit Product' : 'Add Product'}
+                                {editing ? 'Edit Product' : 'Add Product'}
                             </DialogTitle>
                         </DialogHeader>
 
                         <div className="grid gap-4 py-4">
                             <Input
                                 placeholder="Product name"
-                                value={form.name}
+                                value={data.name}
                                 onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        name: e.target.value,
-                                    })
+                                    setData('name', e.target.value)
                                 }
                             />
-
                             <Input
                                 type="number"
                                 placeholder="Price"
-                                value={form.price}
+                                value={data.price}
                                 onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        price: Number(e.target.value),
-                                    })
+                                    setData('price', Number(e.target.value))
                                 }
                             />
-
-                            <p className="text-sm text-muted-foreground">
-                                {formatRupiah(form.price)}
-                            </p>
-
                             <Input
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) =>
-                                    handleImageChange(e.target.files?.[0])
+                                    setData(
+                                        'image',
+                                        e.target.files?.[0] || null,
+                                    )
                                 }
                             />
-
-                            {form.preview && (
-                                <img
-                                    src={form.preview}
-                                    className="h-40 w-full rounded-lg object-cover"
-                                />
-                            )}
                         </div>
 
                         <DialogFooter>
@@ -236,8 +173,8 @@ export default function Products() {
                             >
                                 Cancel
                             </Button>
-                            <Button onClick={handleSubmit}>
-                                {editingId ? 'Update' : 'Save'}
+                            <Button onClick={submit}>
+                                {editing ? 'Update' : 'Save'}
                             </Button>
                         </DialogFooter>
                     </DialogContent>

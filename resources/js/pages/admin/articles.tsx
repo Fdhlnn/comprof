@@ -1,7 +1,8 @@
-import { Head } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
-/* shadcn/ui */
+
+/* shadcn */
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -12,99 +13,68 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Articles',
-        href: '/admin/articles',
-    },
+    { title: 'Articles', href: '/admin/articles' },
 ];
 
 type Article = {
     id: number;
     title: string;
     content: string;
-    image: string;
-    date: string;
+    image: string | null;
+    created_at: string;
 };
 
-export default function Articles() {
-    const [items, setItems] = useState<Article[]>([]);
-
+export default function Articles({ articles }: { articles: Article[] }) {
     const [open, setOpen] = useState(false);
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editing, setEditing] = useState<Article | null>(null);
 
-    const [form, setForm] = useState({
+    const { data, setData, post, processing, reset } = useForm<{
+        title: string;
+        content: string;
+        image: File | null;
+    }>({
         title: '',
         content: '',
-        image: '',
+        image: null,
     });
 
-    const resetForm = () => {
-        setForm({
-            title: '',
-            content: '',
-            image: '',
-        });
-        setEditingId(null);
-    };
-
-    const handleOpenCreate = () => {
-        resetForm();
+    const openCreate = () => {
+        reset();
+        setEditing(null);
         setOpen(true);
     };
 
-    const handleOpenEdit = (item: Article) => {
-        setForm({
+    const openEdit = (item: Article) => {
+        setEditing(item);
+        setData({
             title: item.title,
             content: item.content,
-            image: item.image,
+            image: null,
         });
-        setEditingId(item.id);
         setOpen(true);
     };
 
-    const handleImageUpload = (file: File | null) => {
-        if (!file) return;
-        setForm({
-            ...form,
-            image: URL.createObjectURL(file),
-        });
-    };
-
-    const handleSubmit = () => {
-        if (!form.title || !form.content) return;
-
-        const newItem: Article = {
-            id: editingId ?? Date.now(),
-            title: form.title,
-            content: form.content,
-            image: form.image,
-            date: new Date().toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-            }),
-        };
-
-        if (editingId) {
-            setItems((prev) =>
-                prev.map((item) => (item.id === editingId ? newItem : item)),
-            );
+    const submit = () => {
+        if (editing) {
+            post(`/admin/articles/${editing.id}`, {
+                forceFormData: true,
+                onSuccess: () => setOpen(false),
+            });
         } else {
-            setItems((prev) => [...prev, newItem]);
+            post('/admin/articles', {
+                forceFormData: true,
+                onSuccess: () => setOpen(false),
+            });
         }
-
-        setOpen(false);
-        resetForm();
     };
 
-    const handleDelete = (id: number) => {
+    const remove = (id: number) => {
         if (!confirm('Hapus artikel ini?')) return;
-        setItems((prev) => prev.filter((item) => item.id !== id));
+        router.delete(`/admin/articles/${id}`);
     };
 
     return (
@@ -115,7 +85,7 @@ export default function Articles() {
                 {/* HEADER */}
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Articles</h1>
-                    <Button onClick={handleOpenCreate}>Add Article</Button>
+                    <Button onClick={openCreate}>Add Article</Button>
                 </div>
 
                 {/* TABLE */}
@@ -130,7 +100,7 @@ export default function Articles() {
                             </tr>
                         </thead>
                         <tbody>
-                            {items.length === 0 && (
+                            {articles.length === 0 && (
                                 <tr>
                                     <td
                                         colSpan={4}
@@ -141,12 +111,12 @@ export default function Articles() {
                                 </tr>
                             )}
 
-                            {items.map((item) => (
+                            {articles.map((item) => (
                                 <tr key={item.id} className="border-t">
                                     <td className="px-4 py-3">
                                         {item.image ? (
                                             <img
-                                                src={item.image}
+                                                src={`/storage/${item.image}`}
                                                 className="h-12 w-20 rounded object-cover"
                                             />
                                         ) : (
@@ -159,22 +129,22 @@ export default function Articles() {
                                         {item.title}
                                     </td>
                                     <td className="px-4 py-3 text-muted-foreground">
-                                        {item.date}
+                                        {new Date(
+                                            item.created_at,
+                                        ).toLocaleDateString('id-ID')}
                                     </td>
                                     <td className="flex gap-2 px-4 py-3">
                                         <Button
                                             size="sm"
                                             variant="secondary"
-                                            onClick={() => handleOpenEdit(item)}
+                                            onClick={() => openEdit(item)}
                                         >
                                             Edit
                                         </Button>
                                         <Button
                                             size="sm"
                                             variant="destructive"
-                                            onClick={() =>
-                                                handleDelete(item.id)
-                                            }
+                                            onClick={() => remove(item.id)}
                                         >
                                             Delete
                                         </Button>
@@ -190,31 +160,25 @@ export default function Articles() {
                     <DialogContent className="max-w-lg">
                         <DialogHeader>
                             <DialogTitle>
-                                {editingId ? 'Edit Article' : 'Add Article'}
+                                {editing ? 'Edit Article' : 'Add Article'}
                             </DialogTitle>
                         </DialogHeader>
 
                         <div className="grid gap-4 py-4">
                             <Input
-                                placeholder="Article title"
-                                value={form.title}
+                                placeholder="Title"
+                                value={data.title}
                                 onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        title: e.target.value,
-                                    })
+                                    setData('title', e.target.value)
                                 }
                             />
 
                             <Textarea
                                 rows={6}
-                                placeholder="Article content"
-                                value={form.content}
+                                placeholder="Content"
+                                value={data.content}
                                 onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        content: e.target.value,
-                                    })
+                                    setData('content', e.target.value)
                                 }
                             />
 
@@ -222,18 +186,12 @@ export default function Articles() {
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) =>
-                                    handleImageUpload(
+                                    setData(
+                                        'image',
                                         e.target.files?.[0] || null,
                                     )
                                 }
                             />
-
-                            {form.image && (
-                                <img
-                                    src={form.image}
-                                    className="h-40 w-full rounded object-cover"
-                                />
-                            )}
                         </div>
 
                         <DialogFooter>
@@ -243,8 +201,8 @@ export default function Articles() {
                             >
                                 Cancel
                             </Button>
-                            <Button onClick={handleSubmit}>
-                                {editingId ? 'Update' : 'Save'}
+                            <Button onClick={submit} disabled={processing}>
+                                {editing ? 'Update' : 'Save'}
                             </Button>
                         </DialogFooter>
                     </DialogContent>

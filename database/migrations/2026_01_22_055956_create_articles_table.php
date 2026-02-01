@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('article', function (Blueprint $table) {
+        Schema::create('articles', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->text('content');
-            $table->string('thumbnail')->nullable();
-            $table->string('author');
+            $table->string('image')->nullable();
+            $table->date('published_at')->nullable();
             $table->timestamps();
         });
     }

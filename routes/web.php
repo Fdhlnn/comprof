@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\Products\AdminProductsController;
+use App\Http\Controllers\Articles\AdminArticlesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,12 +48,23 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('admin/dashboard');
     })->name('dashboard');
-    Route::get('/products', function () {
-        return Inertia::render('admin/products');
-    })->name('products');
-    Route::get('/articles', function () {
-        return Inertia::render('admin/articles');
-    })->name('articles');
+
+
+
+    Route::get('/products', [AdminProductsController::class, 'index'])->name('admin.products');
+    Route::post('/products', [AdminProductsController::class, 'store']);
+    Route::put('/products/{product}', [AdminProductsController::class, 'update']);
+    Route::delete('/products/{product}', [AdminProductsController::class, 'destroy']);
+
+    Route::get('/articles', [AdminArticlesController::class, 'index'])->name('admin.articles');
+    Route::post('/articles', [AdminArticlesController::class, 'store']);
+    Route::post('/articles/{article}', [AdminArticlesController::class, 'update']);
+    Route::delete('/articles/{article}', [AdminArticlesController::class, 'destroy']);
+
+
+
+
+
     Route::get('/clients', function () {
         return Inertia::render('admin/clients');
     })->name('clients');
