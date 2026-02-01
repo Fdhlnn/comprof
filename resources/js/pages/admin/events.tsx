@@ -1,5 +1,3 @@
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -14,31 +12,38 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Event',
-        href: "/admin/events",
+        href: '/admin/events',
     },
 ];
+
+type EventStatus = 'upcoming' | 'ongoing' | 'past';
 
 type EventItem = {
     id: number;
     title: string;
+    description: string;
     date: string;
     location: string;
-    description: string;
-    image?: string; // ✅ image
+    status: EventStatus;
+    image?: string;
 };
 
 export default function Event() {
     const [items, setItems] = useState<EventItem[]>([
         {
             id: 1,
-            title: 'Tech Conference 2026',
-            date: '2026-03-12',
-            location: 'Jakarta',
-            description: 'Annual technology conference',
+            title: 'Faith Industries Pop-Up Store',
+            description:
+                'Pop-up store eksklusif menghadirkan koleksi terbaru dan limited edition.',
+            date: '2026-02-15',
+            location: 'Jakarta Selatan',
+            status: 'upcoming',
             image: '',
         },
     ]);
@@ -49,9 +54,10 @@ export default function Event() {
     const [form, setForm] = useState<EventItem>({
         id: 0,
         title: '',
+        description: '',
         date: '',
         location: '',
-        description: '',
+        status: 'upcoming',
         image: '',
     });
 
@@ -59,9 +65,10 @@ export default function Event() {
         setForm({
             id: 0,
             title: '',
+            description: '',
             date: '',
             location: '',
-            description: '',
+            status: 'upcoming',
             image: '',
         });
         setEditingId(null);
@@ -131,14 +138,16 @@ export default function Event() {
                                 <th className="px-4 py-3 text-left">
                                     Location
                                 </th>
+                                <th className="px-4 py-3 text-left">Status</th>
                                 <th className="px-4 py-3 text-left">Action</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {items.length === 0 && (
                                 <tr>
                                     <td
-                                        colSpan={5}
+                                        colSpan={6}
                                         className="px-4 py-6 text-center text-muted-foreground"
                                     >
                                         No events
@@ -165,6 +174,9 @@ export default function Event() {
                                     <td className="px-4 py-3">{item.date}</td>
                                     <td className="px-4 py-3">
                                         {item.location}
+                                    </td>
+                                    <td className="px-4 py-3 capitalize">
+                                        {item.status}
                                     </td>
                                     <td className="flex gap-2 px-4 py-3">
                                         <Button
@@ -204,7 +216,21 @@ export default function Event() {
                                 placeholder="Event title"
                                 value={form.title}
                                 onChange={(e) =>
-                                    setForm({ ...form, title: e.target.value })
+                                    setForm({
+                                        ...form,
+                                        title: e.target.value,
+                                    })
+                                }
+                            />
+
+                            <Textarea
+                                placeholder="Event description"
+                                value={form.description}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        description: e.target.value,
+                                    })
                                 }
                             />
 
@@ -212,7 +238,10 @@ export default function Event() {
                                 type="date"
                                 value={form.date}
                                 onChange={(e) =>
-                                    setForm({ ...form, date: e.target.value })
+                                    setForm({
+                                        ...form,
+                                        date: e.target.value,
+                                    })
                                 }
                             />
 
@@ -227,16 +256,21 @@ export default function Event() {
                                 }
                             />
 
-                            <Textarea
-                                placeholder="Description"
-                                value={form.description}
+                            {/* STATUS */}
+                            <select
+                                value={form.status}
                                 onChange={(e) =>
                                     setForm({
                                         ...form,
-                                        description: e.target.value,
+                                        status: e.target.value as EventStatus,
                                     })
                                 }
-                            />
+                                className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                            >
+                                <option value="upcoming">Upcoming</option>
+                                <option value="ongoing">Ongoing</option>
+                                <option value="past">Past</option>
+                            </select>
 
                             {/* IMAGE UPLOAD */}
                             <Input

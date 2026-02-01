@@ -1,5 +1,3 @@
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -15,48 +13,39 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem } from '@/types';
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Article',
-        href: "/admin/articles",
+        title: 'Articles',
+        href: '/admin/articles',
     },
 ];
 
-type ArticleItem = {
+type Article = {
     id: number;
     title: string;
-    author: string;
     content: string;
-    image?: string;
+    image: string;
+    date: string;
 };
 
-export default function Article() {
-    const [items, setItems] = useState<ArticleItem[]>([
-        {
-            id: 1,
-            title: 'Technology Trends 2026',
-            author: 'Admin',
-            content: 'Latest technology trends you should know in 2026.',
-            image: '',
-        },
-    ]);
+export default function Articles() {
+    const [items, setItems] = useState<Article[]>([]);
 
     const [open, setOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
 
-    const [form, setForm] = useState<ArticleItem>({
-        id: 0,
+    const [form, setForm] = useState({
         title: '',
-        author: '',
         content: '',
         image: '',
     });
 
     const resetForm = () => {
         setForm({
-            id: 0,
             title: '',
-            author: '',
             content: '',
             image: '',
         });
@@ -68,32 +57,45 @@ export default function Article() {
         setOpen(true);
     };
 
-    const handleOpenEdit = (item: ArticleItem) => {
-        setForm(item);
+    const handleOpenEdit = (item: Article) => {
+        setForm({
+            title: item.title,
+            content: item.content,
+            image: item.image,
+        });
         setEditingId(item.id);
         setOpen(true);
     };
 
-    const handleImageChange = (file: File | null) => {
+    const handleImageUpload = (file: File | null) => {
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-            setForm({ ...form, image: reader.result as string });
-        };
-        reader.readAsDataURL(file);
+        setForm({
+            ...form,
+            image: URL.createObjectURL(file),
+        });
     };
 
     const handleSubmit = () => {
-        if (!form.title || !form.author) return;
+        if (!form.title || !form.content) return;
+
+        const newItem: Article = {
+            id: editingId ?? Date.now(),
+            title: form.title,
+            content: form.content,
+            image: form.image,
+            date: new Date().toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+            }),
+        };
 
         if (editingId) {
             setItems((prev) =>
-                prev.map((item) =>
-                    item.id === editingId ? { ...item, ...form } : item,
-                ),
+                prev.map((item) => (item.id === editingId ? newItem : item)),
             );
         } else {
-            setItems((prev) => [...prev, { ...form, id: Date.now() }]);
+            setItems((prev) => [...prev, newItem]);
         }
 
         setOpen(false);
@@ -107,12 +109,12 @@ export default function Article() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Article" />
+            <Head title="Articles" />
 
             <div className="flex flex-col gap-6 p-4">
                 {/* HEADER */}
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Article</h1>
+                    <h1 className="text-2xl font-bold">Articles</h1>
                     <Button onClick={handleOpenCreate}>Add Article</Button>
                 </div>
 
@@ -123,7 +125,7 @@ export default function Article() {
                             <tr>
                                 <th className="px-4 py-3 text-left">Image</th>
                                 <th className="px-4 py-3 text-left">Title</th>
-                                <th className="px-4 py-3 text-left">Author</th>
+                                <th className="px-4 py-3 text-left">Date</th>
                                 <th className="px-4 py-3 text-left">Action</th>
                             </tr>
                         </thead>
@@ -145,8 +147,7 @@ export default function Article() {
                                         {item.image ? (
                                             <img
                                                 src={item.image}
-                                                alt={item.title}
-                                                className="h-12 w-16 rounded object-cover"
+                                                className="h-12 w-20 rounded object-cover"
                                             />
                                         ) : (
                                             <span className="text-muted-foreground">
@@ -154,8 +155,12 @@ export default function Article() {
                                             </span>
                                         )}
                                     </td>
-                                    <td className="px-4 py-3">{item.title}</td>
-                                    <td className="px-4 py-3">{item.author}</td>
+                                    <td className="px-4 py-3 font-medium">
+                                        {item.title}
+                                    </td>
+                                    <td className="px-4 py-3 text-muted-foreground">
+                                        {item.date}
+                                    </td>
                                     <td className="flex gap-2 px-4 py-3">
                                         <Button
                                             size="sm"
@@ -182,7 +187,7 @@ export default function Article() {
 
                 {/* MODAL */}
                 <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogContent>
+                    <DialogContent className="max-w-lg">
                         <DialogHeader>
                             <DialogTitle>
                                 {editingId ? 'Edit Article' : 'Add Article'}
@@ -194,20 +199,16 @@ export default function Article() {
                                 placeholder="Article title"
                                 value={form.title}
                                 onChange={(e) =>
-                                    setForm({ ...form, title: e.target.value })
-                                }
-                            />
-
-                            <Input
-                                placeholder="Author"
-                                value={form.author}
-                                onChange={(e) =>
-                                    setForm({ ...form, author: e.target.value })
+                                    setForm({
+                                        ...form,
+                                        title: e.target.value,
+                                    })
                                 }
                             />
 
                             <Textarea
-                                placeholder="Content"
+                                rows={6}
+                                placeholder="Article content"
                                 value={form.content}
                                 onChange={(e) =>
                                     setForm({
@@ -217,12 +218,11 @@ export default function Article() {
                                 }
                             />
 
-                            {/* IMAGE UPLOAD */}
                             <Input
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) =>
-                                    handleImageChange(
+                                    handleImageUpload(
                                         e.target.files?.[0] || null,
                                     )
                                 }
@@ -231,8 +231,7 @@ export default function Article() {
                             {form.image && (
                                 <img
                                     src={form.image}
-                                    alt="Preview"
-                                    className="h-32 w-full rounded object-cover"
+                                    className="h-40 w-full rounded object-cover"
                                 />
                             )}
                         </div>

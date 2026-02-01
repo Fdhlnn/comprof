@@ -1,6 +1,3 @@
-import AppLayout from '@/layouts/app-layout';
-import { products } from '@/routes';
-import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -14,27 +11,30 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem } from '@/types';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Products',
-        href: "/admin/products",
-    },
-];
+/* ================= HELPERS ================= */
+const formatRupiah = (value: number) => {
+    if (!value) return 'Rp 0';
+    return 'Rp ' + value.toLocaleString('id-ID');
+};
 
+/* ================= TYPES ================= */
 type Product = {
     id: number;
     name: string;
     price: number;
-    stock: number;
+    image: string;
 };
 
+/* ================= BREADCRUMB ================= */
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Products', href: '/admin/products' },
+];
+
 export default function Products() {
-    const [items, setItems] = useState<Product[]>([
-        { id: 1, name: 'Product A', price: 120000, stock: 10 },
-        { id: 2, name: 'Product B', price: 95000, stock: 5 },
-        { id: 3, name: 'Product C', price: 150000, stock: 8 },
-    ]);
+    const [items, setItems] = useState<Product[]>([]);
 
     const [open, setOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -42,11 +42,13 @@ export default function Products() {
     const [form, setForm] = useState({
         name: '',
         price: 0,
-        stock: 0,
+        image: null as File | null,
+        preview: '',
     });
 
+    /* ================= HANDLERS ================= */
     const resetForm = () => {
-        setForm({ name: '', price: 0, stock: 0 });
+        setForm({ name: '', price: 0, image: null, preview: '' });
         setEditingId(null);
     };
 
@@ -59,23 +61,38 @@ export default function Products() {
         setForm({
             name: product.name,
             price: product.price,
-            stock: product.stock,
+            image: null,
+            preview: product.image,
         });
         setEditingId(product.id);
         setOpen(true);
     };
 
+    const handleImageChange = (file?: File) => {
+        if (!file) return;
+        setForm({
+            ...form,
+            image: file,
+            preview: URL.createObjectURL(file),
+        });
+    };
+
     const handleSubmit = () => {
-        if (!form.name) return;
+        if (!form.name || !form.price || !form.preview) return;
+
+        const payload: Product = {
+            id: editingId ?? Date.now(),
+            name: form.name,
+            price: form.price,
+            image: form.preview,
+        };
 
         if (editingId) {
             setItems((prev) =>
-                prev.map((item) =>
-                    item.id === editingId ? { ...item, ...form } : item,
-                ),
+                prev.map((item) => (item.id === editingId ? payload : item)),
             );
         } else {
-            setItems((prev) => [...prev, { id: Date.now(), ...form }]);
+            setItems((prev) => [...prev, payload]);
         }
 
         setOpen(false);
@@ -87,47 +104,43 @@ export default function Products() {
         setItems((prev) => prev.filter((item) => item.id !== id));
     };
 
+    /* ================= RENDER ================= */
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Products" />
 
             <div className="flex flex-col gap-6 p-4">
-                {/* ===== HEADER ===== */}
+                {/* HEADER */}
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Products</h1>
                     <Button onClick={handleOpenCreate}>Add Product</Button>
                 </div>
 
-                {/* ===== TABLE ===== */}
+                {/* TABLE */}
                 <div className="overflow-x-auto rounded-xl border">
                     <table className="w-full text-sm">
                         <thead className="bg-muted">
                             <tr>
+                                <th className="px-4 py-3">Image</th>
                                 <th className="px-4 py-3 text-left">Name</th>
                                 <th className="px-4 py-3 text-left">Price</th>
-                                <th className="px-4 py-3 text-left">Stock</th>
                                 <th className="px-4 py-3 text-left">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {items.length === 0 && (
-                                <tr>
-                                    <td
-                                        colSpan={4}
-                                        className="px-4 py-6 text-center text-muted-foreground"
-                                    >
-                                        No products
-                                    </td>
-                                </tr>
-                            )}
 
+                        <tbody>
                             {items.map((item) => (
                                 <tr key={item.id} className="border-t">
+                                    <td className="px-4 py-3">
+                                        <img
+                                            src={item.image}
+                                            className="h-14 w-14 rounded-md object-cover"
+                                        />
+                                    </td>
                                     <td className="px-4 py-3">{item.name}</td>
                                     <td className="px-4 py-3">
-                                        Rp {item.price.toLocaleString('id-ID')}
+                                        {formatRupiah(item.price)}
                                     </td>
-                                    <td className="px-4 py-3">{item.stock}</td>
                                     <td className="flex gap-2 px-4 py-3">
                                         <Button
                                             size="sm"
@@ -148,11 +161,22 @@ export default function Products() {
                                     </td>
                                 </tr>
                             ))}
+
+                            {items.length === 0 && (
+                                <tr>
+                                    <td
+                                        colSpan={4}
+                                        className="px-4 py-6 text-center text-muted-foreground"
+                                    >
+                                        No products
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
 
-                {/* ===== MODAL ===== */}
+                {/* MODAL */}
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogContent>
                         <DialogHeader>
@@ -166,9 +190,13 @@ export default function Products() {
                                 placeholder="Product name"
                                 value={form.name}
                                 onChange={(e) =>
-                                    setForm({ ...form, name: e.target.value })
+                                    setForm({
+                                        ...form,
+                                        name: e.target.value,
+                                    })
                                 }
                             />
+
                             <Input
                                 type="number"
                                 placeholder="Price"
@@ -180,17 +208,25 @@ export default function Products() {
                                     })
                                 }
                             />
+
+                            <p className="text-sm text-muted-foreground">
+                                {formatRupiah(form.price)}
+                            </p>
+
                             <Input
-                                type="number"
-                                placeholder="Stock"
-                                value={form.stock}
+                                type="file"
+                                accept="image/*"
                                 onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        stock: Number(e.target.value),
-                                    })
+                                    handleImageChange(e.target.files?.[0])
                                 }
                             />
+
+                            {form.preview && (
+                                <img
+                                    src={form.preview}
+                                    className="h-40 w-full rounded-lg object-cover"
+                                />
+                            )}
                         </div>
 
                         <DialogFooter>

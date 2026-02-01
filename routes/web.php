@@ -14,7 +14,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/events', fn() => Inertia::render('comprof/events'));
     Route::get('/contact', fn() => Inertia::render('comprof/contact'));
 
-    Route::get('/login', fn() => Inertia::render('Auth/Login'))->name('login');
+    Route::get('/login', fn() => Inertia::render('auth/login'))->name('login');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
