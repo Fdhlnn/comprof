@@ -4,26 +4,17 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
-Route::get('/home', function () {
-    return Inertia::render('comprof/home', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]);
-})->name('home');
-
 Route::middleware('guest')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('comprof/home');
-    })->name('home');
-
+    Route::get('/', fn() => Inertia::render('comprof/home'))->name('home');
     Route::get('/about', fn() => Inertia::render('comprof/about-us'));
-    Route::get('/events', fn() => Inertia::render('comprof/events'));
     Route::get('/products', fn() => Inertia::render('comprof/products'));
+    Route::get('/clients', fn() => Inertia::render('comprof/clients'));
     Route::get('/articles', fn() => Inertia::render('comprof/articles'));
     Route::get('/gallery', fn() => Inertia::render('comprof/gallery'));
+    Route::get('/events', fn() => Inertia::render('comprof/events'));
     Route::get('/contact', fn() => Inertia::render('comprof/contact'));
 
-    Route::get('/login', fn() => Inertia::render('Auth/Login'))
-        ->name('login');
+    Route::get('/login', fn() => Inertia::render('Auth/Login'))->name('login');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {

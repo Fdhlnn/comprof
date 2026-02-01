@@ -1,18 +1,23 @@
-import { BookOpen, Box, Calendar, ImageIcon, LayoutGrid, Users } from 'lucide-react';
+import { BookOpen, Box, Calendar, Home, ImageIcon, Info, Users } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import {Sidebar,SidebarContent, SidebarHeader,} from '@/components/ui/sidebar';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: '#',
-        icon: LayoutGrid,
+        title: 'Home',
+        href: "/home",
+        icon: Home,
     },
     {
         title: 'Products',
-        href: '#',
+        href: "/products",
         icon: Box,
+    },
+    {
+        title: 'About',
+        href: "/about",
+        icon: Info,
     },
     {
         title: 'Clients',

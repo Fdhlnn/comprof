@@ -141,3 +141,12 @@
         @apply bg-background text-foreground;
     }
 }
+
+.swiper-pagination-bullet {
+    background: #ffffff70;
+    opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+    background: white;
+}
