@@ -2,20 +2,44 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Fortify\Features;
+
+/*
+|--------------------------------------------------------------------------
+| PUBLIC / USER (COMPANY PROFILE)
+|--------------------------------------------------------------------------
+| Bisa diakses tanpa login
+| Pakai MainLayout
+*/
+
+Route::get('/', fn() => Inertia::render('comprof/home'))->name('home');
+Route::get('/about', fn() => Inertia::render('comprof/about-us'));
+Route::get('/products', fn() => Inertia::render('comprof/products'));
+Route::get('/clients', fn() => Inertia::render('comprof/clients'));
+Route::get('/articles', fn() => Inertia::render('comprof/articles'));
+Route::get('/gallery', fn() => Inertia::render('comprof/gallery'));
+Route::get('/events', fn() => Inertia::render('comprof/events'));
+Route::get('/contact', fn() => Inertia::render('comprof/contact'));
+Route::get('/payment/{id}', fn($id) => Inertia::render('comprof/payment', ['id' => (int) $id]))->name('payment');
+
+
+/*
+|--------------------------------------------------------------------------
+| AUTH (GUEST ONLY)
+|--------------------------------------------------------------------------
+| Login hanya untuk user yang belum login
+*/
 
 Route::middleware('guest')->group(function () {
-    Route::get('/', fn() => Inertia::render('comprof/home'))->name('home');
-    Route::get('/about', fn() => Inertia::render('comprof/about-us'));
-    Route::get('/products', fn() => Inertia::render('comprof/products'));
-    Route::get('/clients', fn() => Inertia::render('comprof/clients'));
-    Route::get('/articles', fn() => Inertia::render('comprof/articles'));
-    Route::get('/gallery', fn() => Inertia::render('comprof/gallery'));
-    Route::get('/events', fn() => Inertia::render('comprof/events'));
-    Route::get('/contact', fn() => Inertia::render('comprof/contact'));
-
     Route::get('/login', fn() => Inertia::render('auth/login'))->name('login');
 });
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN PANEL
+|--------------------------------------------------------------------------
+| Wajib login + verified
+| Pakai AppLayout
+*/
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
@@ -38,4 +62,4 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     })->name('events');
 });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';
