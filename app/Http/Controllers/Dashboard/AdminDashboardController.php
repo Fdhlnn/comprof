@@ -8,13 +8,14 @@ use App\Models\Article;
 use App\Models\Gallery;
 use App\Models\Events;
 use App\Models\Clients;
+use App\Models\Products;
 
 class AdminDashboardController extends Controller
 {
     public function index()
     {
         $stats = [
-            'articles' => Article::count(),
+            'products' => Products::count(),
             'gallery'  => Gallery::count(),
             'events'   => Events::count(),
             'clients'  => Clients::count(),

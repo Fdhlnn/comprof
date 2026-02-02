@@ -15,9 +15,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Dashboard({ stats }: { stats: any }) {
     const items = [
         {
-            title: 'Articles',
-            value: stats.articles,
-            description: 'Total articles',
+            title: 'Products',
+            value: stats.products,
+            description: 'Stocks',
         },
         {
             title: 'Gallery',
