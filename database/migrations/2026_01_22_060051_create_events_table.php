@@ -19,6 +19,7 @@ return new class extends Migration
             $table->dateTime('end_date');
             $table->text('content');
             $table->string('location')->nullable();
+            $table->enum('status', ['upcoming','ongoing', 'past'])->default('upcoming');
             $table->string('image')->nullable();
             $table->timestamps();
         });

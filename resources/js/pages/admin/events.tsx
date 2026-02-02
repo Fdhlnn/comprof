@@ -1,7 +1,5 @@
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-
-/* shadcn/ui */
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -16,104 +14,101 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Event',
-        href: '/admin/events',
-    },
+    { title: 'Event', href: '/admin/events' },
 ];
 
 type EventStatus = 'upcoming' | 'ongoing' | 'past';
 
 type EventItem = {
     id: number;
-    title: string;
-    description: string;
-    date: string;
-    location: string;
+    name: string;
+    description?: string;
+    content: string;
+    start_date: string;
+    end_date: string;
+    location?: string;
     status: EventStatus;
     image?: string;
 };
 
-export default function Event() {
-    const [items, setItems] = useState<EventItem[]>([
-        {
-            id: 1,
-            title: 'Faith Industries Pop-Up Store',
-            description:
-                'Pop-up store eksklusif menghadirkan koleksi terbaru dan limited edition.',
-            date: '2026-02-15',
-            location: 'Jakarta Selatan',
-            status: 'upcoming',
-            image: '',
-        },
-    ]);
-
+export default function Event({ events }: { events: EventItem[] }) {
     const [open, setOpen] = useState(false);
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editing, setEditing] = useState<EventItem | null>(null);
 
-    const [form, setForm] = useState<EventItem>({
-        id: 0,
-        title: '',
+    const {
+        data,
+        setData,
+        post,
+        put,
+        delete: destroy,
+        reset,
+    } = useForm({
+        name: '',
         description: '',
-        date: '',
+        content: '',
+        start_date: '',
+        end_date: '',
         location: '',
-        status: 'upcoming',
-        image: '',
+        status: 'upcoming' as EventStatus,
+        image: null as File | null,
     });
 
-    const resetForm = () => {
-        setForm({
-            id: 0,
-            title: '',
-            description: '',
-            date: '',
-            location: '',
-            status: 'upcoming',
-            image: '',
+    const openCreate = () => {
+        reset();
+        setEditing(null);
+        setOpen(true);
+    };
+
+    const openEdit = (event: EventItem) => {
+        setEditing(event);
+        setData({
+            name: event.name,
+            description: event.description || '',
+            content: event.content,
+            start_date: event.start_date,
+            end_date: event.end_date,
+            location: event.location || '',
+            status: event.status,
+            image: null,
         });
-        setEditingId(null);
-    };
-
-    const handleOpenCreate = () => {
-        resetForm();
         setOpen(true);
     };
 
-    const handleOpenEdit = (item: EventItem) => {
-        setForm(item);
-        setEditingId(item.id);
-        setOpen(true);
-    };
+    const submit = () => {
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('content', data.content);
+        formData.append('start_date', data.start_date);
+        formData.append('end_date', data.end_date);
+        formData.append('location', data.location);
+        if (data.image) formData.append('image', data.image);
 
-    const handleImageChange = (file: File | null) => {
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-            setForm({ ...form, image: reader.result as string });
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const handleSubmit = () => {
-        if (!form.title || !form.date || !form.location) return;
-
-        if (editingId) {
-            setItems((prev) =>
-                prev.map((item) =>
-                    item.id === editingId ? { ...item, ...form } : item,
-                ),
-            );
+        if (editing) {
+            formData.append('_method', 'PUT');
+            put(`/admin/events/${editing.id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+                onSuccess: () => {
+                    setOpen(false);
+                    reset();
+                    setEditing(null);
+                },
+            });
         } else {
-            setItems((prev) => [...prev, { ...form, id: Date.now() }]);
+            post('/admin/events', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+                onSuccess: () => {
+                    setOpen(false);
+                    reset();
+                },
+            });
         }
-
-        setOpen(false);
-        resetForm();
     };
 
     const handleDelete = (id: number) => {
         if (!confirm('Hapus event ini?')) return;
-        setItems((prev) => prev.filter((item) => item.id !== id));
+
+        destroy(`/admin/events/${id}`);
     };
 
     return (
@@ -121,20 +116,19 @@ export default function Event() {
             <Head title="Event" />
 
             <div className="flex flex-col gap-6 p-4">
-                {/* HEADER */}
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Event</h1>
-                    <Button onClick={handleOpenCreate}>Add Event</Button>
+                    <Button onClick={openCreate}>Add Event</Button>
                 </div>
 
-                {/* TABLE */}
                 <div className="overflow-x-auto rounded-xl border">
                     <table className="w-full text-sm">
                         <thead className="bg-muted">
                             <tr>
                                 <th className="px-4 py-3 text-left">Image</th>
                                 <th className="px-4 py-3 text-left">Title</th>
-                                <th className="px-4 py-3 text-left">Date</th>
+                                <th className="px-4 py-3 text-left">Start</th>
+                                <th className="px-4 py-3 text-left">End</th>
                                 <th className="px-4 py-3 text-left">
                                     Location
                                 </th>
@@ -144,10 +138,10 @@ export default function Event() {
                         </thead>
 
                         <tbody>
-                            {items.length === 0 && (
+                            {events.length === 0 && (
                                 <tr>
                                     <td
-                                        colSpan={6}
+                                        colSpan={7}
                                         className="px-4 py-6 text-center text-muted-foreground"
                                     >
                                         No events
@@ -155,13 +149,13 @@ export default function Event() {
                                 </tr>
                             )}
 
-                            {items.map((item) => (
+                            {events.map((item) => (
                                 <tr key={item.id} className="border-t">
                                     <td className="px-4 py-3">
                                         {item.image ? (
                                             <img
-                                                src={item.image}
-                                                alt={item.title}
+                                                src={`/storage/${item.image}`}
+                                                alt={item.name}
                                                 className="h-12 w-16 rounded object-cover"
                                             />
                                         ) : (
@@ -170,19 +164,32 @@ export default function Event() {
                                             </span>
                                         )}
                                     </td>
-                                    <td className="px-4 py-3">{item.title}</td>
-                                    <td className="px-4 py-3">{item.date}</td>
+                                    <td className="px-4 py-3">{item.name}</td>
+                                    <td className="px-4 py-3">
+                                        {item.start_date}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        {item.end_date}
+                                    </td>
                                     <td className="px-4 py-3">
                                         {item.location}
                                     </td>
-                                    <td className="px-4 py-3 capitalize">
+                                    <td
+                                        className={`px-4 py-3 capitalize ${
+                                            item.status === 'upcoming'
+                                                ? 'text-blue-600'
+                                                : item.status === 'ongoing'
+                                                  ? 'text-green-600'
+                                                  : 'text-gray-600'
+                                        }`}
+                                    >
                                         {item.status}
                                     </td>
                                     <td className="flex gap-2 px-4 py-3">
                                         <Button
                                             size="sm"
                                             variant="secondary"
-                                            onClick={() => handleOpenEdit(item)}
+                                            onClick={() => openEdit(item)}
                                         >
                                             Edit
                                         </Button>
@@ -207,85 +214,71 @@ export default function Event() {
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>
-                                {editingId ? 'Edit Event' : 'Add Event'}
+                                {editing ? 'Edit Event' : 'Add Event'}
                             </DialogTitle>
                         </DialogHeader>
 
                         <div className="grid gap-4 py-4">
                             <Input
                                 placeholder="Event title"
-                                value={form.title}
+                                value={data.name}
                                 onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        title: e.target.value,
-                                    })
+                                    setData('name', e.target.value)
                                 }
                             />
-
                             <Textarea
-                                placeholder="Event description"
-                                value={form.description}
+                                placeholder="Description"
+                                value={data.description}
                                 onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        description: e.target.value,
-                                    })
+                                    setData('description', e.target.value)
                                 }
                             />
-
+                            <Textarea
+                                placeholder="Content"
+                                value={data.content}
+                                onChange={(e) =>
+                                    setData('content', e.target.value)
+                                }
+                            />
                             <Input
                                 type="date"
-                                value={form.date}
+                                value={data.start_date}
                                 onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        date: e.target.value,
-                                    })
+                                    setData('start_date', e.target.value)
                                 }
                             />
-
+                            <Input
+                                type="date"
+                                value={data.end_date}
+                                onChange={(e) =>
+                                    setData('end_date', e.target.value)
+                                }
+                            />
                             <Input
                                 placeholder="Location"
-                                value={form.location}
+                                value={data.location}
                                 onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        location: e.target.value,
-                                    })
+                                    setData('location', e.target.value)
                                 }
                             />
-
-                            {/* STATUS */}
-                            <select
-                                value={form.status}
-                                onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        status: e.target.value as EventStatus,
-                                    })
-                                }
-                                className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-                            >
-                                <option value="upcoming">Upcoming</option>
-                                <option value="ongoing">Ongoing</option>
-                                <option value="past">Past</option>
-                            </select>
-
-                            {/* IMAGE UPLOAD */}
                             <Input
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) =>
-                                    handleImageChange(
+                                    setData(
+                                        'image',
                                         e.target.files?.[0] || null,
                                     )
                                 }
                             />
 
-                            {form.image && (
+                            {data.image && (
                                 <img
-                                    src={form.image}
+                                    src={
+                                        typeof data.image === 'string'
+                                            ? data.image
+                                            : URL.createObjectURL(data.image)
+                                    }
                                     alt="Preview"
                                     className="h-32 w-full rounded object-cover"
                                 />
@@ -295,12 +288,16 @@ export default function Event() {
                         <DialogFooter>
                             <Button
                                 variant="secondary"
-                                onClick={() => setOpen(false)}
+                                onClick={() => {
+                                    setOpen(false);
+                                    reset();
+                                    setEditing(null);
+                                }}
                             >
                                 Cancel
                             </Button>
-                            <Button onClick={handleSubmit}>
-                                {editingId ? 'Update' : 'Save'}
+                            <Button onClick={submit}>
+                                {editing ? 'Update' : 'Save'}
                             </Button>
                         </DialogFooter>
                     </DialogContent>

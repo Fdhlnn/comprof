@@ -21,22 +21,22 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Clients',
-        href: '#',
+        href: '/clients',
         icon: Users,
     },
     {
         title: 'Articles',
-        href: '#',
+        href: '/articles',
         icon: BookOpen,
     },
     {
         title: 'Gallery',
-        href: '#',
+        href: 'gallery',
         icon: ImageIcon,
     },
     {
         title: 'Events',
-        href: '#',
+        href: '/events',
         icon: Calendar,
     },
 ];

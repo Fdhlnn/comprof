@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Storage;
+use Illuminate\Support\Facades\Storage;
 
 class AdminProductsController extends Controller
 {

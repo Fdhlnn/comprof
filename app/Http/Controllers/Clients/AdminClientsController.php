@@ -1,49 +1,70 @@
 <?php
 
 namespace App\Http\Controllers\Clients;
-use Inertia\Inertia;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
-class ClientsController extends Controller
+use App\Http\Controllers\Controller;
+use App\Models\Clients;
+use Inertia\Inertia;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+class AdminClientsController extends Controller
 {
+
     public function index()
     {
-        return inertia::render('Clients/Index');
-    }
-
-    public function create()
-    {
-        return inertia::render('Clients/Create', [
-            'name' => 'Client Name',
-            'logo' => 'Upload Client Logo',
-            'website' => 'Client Website URL',
-            'description' => 'Client Description',
-            'order' => 'Display Order',
+        return Inertia::render('admin/clients', [
+            'clients' => Clients::latest()->get(),
         ]);
     }
 
-    public function edit($client)
-    {
-        return inertia::render('Clients/Edit', [
-            'client' => $client,
-        ]);
-    }
 
-    public function update(Request $request, $client)
+    public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'logo' => 'required|string|max:255',
-            'website' => 'nullable|url|max:255',
-            'description' => 'nullable|string',
-            'order' => 'required|integer',
+        $data = $request->validate([
+            'name'    => 'required|string',
+            'company'    => 'nullable|string',
+            'message' => 'required|string',
+            'rating'  => 'required|integer|min:1|max:5',
+            'avatar'  => 'required|image|max:2048',
         ]);
 
-        $client->update($validated);
+        if ($request->hasFile('avatar')) {
+            $data['avatar'] = $request->file('avatar')->store('clients', 'public');
+        }
 
-        return redirect()->route('clients.index')->with('success', 'Client updated successfully.');
+        Clients::create($data);
+
+        return redirect()->back();
     }
 
-    
+    // Update client review
+    public function update(Request $request, Clients $client)
+    {
+        $data = $request->validate([
+            'name'    => 'required|string',
+            'company'    => 'nullable|string',
+            'message' => 'required|string',
+            'rating'  => 'required|integer|min:1|max:5',
+            'avatar'  => 'required|image|max:2048',
+        ]);
+
+        if ($request->hasFile('avatar')) {
+            Storage::disk('public')->delete($client->avatar);
+            $data['avatar'] = $request->file('avatar')->store('clients', 'public');
+        }
+
+        $client->update($data);
+
+        return redirect()->back();
+    }
+
+
+    public function destroy(Clients $clients)
+    {
+        Storage::disk('public')->delete($clients->avatar);
+        $clients->delete();
+
+        return redirect()->route('admin.clients');
+    }
 }

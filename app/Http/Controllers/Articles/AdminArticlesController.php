@@ -12,7 +12,7 @@ class AdminArticlesController extends Controller
 {
     public function index()
     {
-        return Inertia::render('admin/articles/index', [
+        return Inertia::render('admin/articles', [
             'articles' => Article::latest()->get(),
         ]);
     }

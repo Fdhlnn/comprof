@@ -1,9 +1,9 @@
+import { Head } from '@inertiajs/react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
 
 /* shadcn/ui */
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -12,26 +12,26 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard() {
-    const stats = [
+export default function Dashboard({ stats }: { stats: any }) {
+    const items = [
         {
             title: 'Articles',
-            value: 12,
+            value: stats.articles,
             description: 'Total articles',
         },
         {
             title: 'Gallery',
-            value: 24,
+            value: stats.gallery,
             description: 'Images uploaded',
         },
         {
             title: 'Events',
-            value: 5,
+            value: stats.events,
             description: 'Upcoming events',
         },
         {
             title: 'Clients',
-            value: 8,
+            value: stats.clients,
             description: 'Active clients',
         },
     ];
@@ -41,7 +41,6 @@ export default function Dashboard() {
             <Head title="Dashboard" />
 
             <div className="flex flex-col gap-6 p-4">
-                {/* ===== TITLE ===== */}
                 <div>
                     <h1 className="text-2xl font-bold">Dashboard</h1>
                     <p className="text-muted-foreground">
@@ -49,9 +48,8 @@ export default function Dashboard() {
                     </p>
                 </div>
 
-                {/* ===== STATS ===== */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {stats.map((item, index) => (
+                    {items.map((item, index) => (
                         <Card key={index}>
                             <CardHeader>
                                 <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -73,3 +71,4 @@ export default function Dashboard() {
         </AppLayout>
     );
 }
+
