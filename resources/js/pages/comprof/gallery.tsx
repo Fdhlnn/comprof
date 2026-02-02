@@ -1,40 +1,13 @@
 import { Head } from '@inertiajs/react';
 import MainLayout from '@/layouts/main-layout';
 
-const galleries = [
-    {
-        id: 1,
-        image: '/images/gallery-1.jpg',
-        title: 'Faith Industries – Street Campaign',
-    },
-    {
-        id: 2,
-        image: '/images/gallery-2.jpg',
-        title: 'Limited Edition Merchandise',
-    },
-    {
-        id: 3,
-        image: '/images/gallery-3.jpg',
-        title: 'Behind The Scene Production',
-    },
-    {
-        id: 4,
-        image: '/images/gallery-4.jpg',
-        title: 'Urban Lifestyle Collection',
-    },
-    {
-        id: 5,
-        image: '/images/gallery-5.jpg',
-        title: 'Faith Industries Event',
-    },
-    {
-        id: 6,
-        image: '/images/gallery-6.jpg',
-        title: 'Creative Process',
-    },
-];
+type GalleryItem = {
+    id: number;
+    image: string | null;
+    title: string;
+};
 
-export default function Gallery() {
+export default function Gallery({ gallery }: { gallery: GalleryItem[] }) {
     return (
         <MainLayout>
             <Head title="Gallery" />
@@ -54,14 +27,17 @@ export default function Gallery() {
 
                     {/* Grid */}
                     <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                        {galleries.map((item) => (
+                        {gallery.map((item) => (
                             <div
                                 key={item.id}
                                 className="group relative aspect-square cursor-pointer overflow-hidden rounded-2xl bg-neutral-900"
                             >
                                 {/* Image */}
                                 <img
-                                    src={item.image}
+                                    src={
+                                        item.image ??
+                                        '/images/gallery-placeholder.jpg'
+                                    }
                                     alt={item.title}
                                     className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
                                 />

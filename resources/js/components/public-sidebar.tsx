@@ -1,4 +1,4 @@
-import { BookOpen, Box, Calendar, Home, ImageIcon, Info, Users } from 'lucide-react';
+import { BookOpen, Box, Building, Calendar, Home, ImageIcon, Info, Users } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import {Sidebar,SidebarContent, SidebarHeader,} from '@/components/ui/sidebar';
 import type { NavItem } from '@/types';
@@ -18,6 +18,11 @@ const mainNavItems: NavItem[] = [
         title: 'About',
         href: "/about",
         icon: Info,
+    },
+    {
+        title: 'Profile',
+        href: "/profile",
+        icon: Building
     },
     {
         title: 'Clients',

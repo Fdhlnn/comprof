@@ -3,37 +3,16 @@ import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { useRef } from 'react';
 import MainLayout from '@/layouts/main-layout';
 
-const reviews = [
-    {
-        id: 1,
-        name: 'Rizky Pratama',
-        role: 'Founder – Urban Streetwear',
-        avatar: '/images/client.jpg',
-        rating: 5,
-        message:
-            'Faith Industries selalu deliver desain yang fresh dan relevan dengan market kami. Kualitas produknya juga konsisten.',
-    },
-    {
-        id: 2,
-        name: 'Nadya Putri',
-        role: 'Creative Director – Local Studio',
-        avatar: '/images/client.jpg',
-        rating: 5,
-        message:
-            'Kolaborasi berjalan sangat smooth. Timnya responsif dan konsep yang ditawarkan selalu matang.',
-    },
-    {
-        id: 3,
-        name: 'Bagas Aditya',
-        role: 'Event Organizer',
-        avatar: '/images/client.jpg',
-        rating: 4,
-        message:
-            'Merchandise dari Faith Industries selalu jadi highlight di setiap event. Packaging rapi dan eksklusif.',
-    },
-];
+type Client = {
+    id: number;
+    name: string;
+    company: string;
+    avatar: string | null;
+    rating: number;
+    message: string;
+};
 
-export default function Reviews() {
+export default function Clients({ reviews }: { reviews: Client[] }) {
     const sliderRef = useRef<HTMLDivElement>(null);
 
     const scroll = (direction: 'left' | 'right') => {
@@ -50,6 +29,7 @@ export default function Reviews() {
 
             <section className="bg-black py-24">
                 <div className="relative mx-auto max-w-6xl px-6">
+                    {/* Header */}
                     <h2 className="mb-4 text-center text-3xl font-bold text-white md:text-4xl">
                         Client Reviews
                     </h2>
@@ -58,14 +38,13 @@ export default function Reviews() {
                         Industries.
                     </p>
 
-                    {/* Navigation */}
+                    {/* Navigation Buttons */}
                     <button
                         onClick={() => scroll('left')}
                         className="absolute top-1/2 left-0 hidden -translate-y-1/2 rounded-full bg-neutral-900 p-3 transition hover:bg-neutral-800 md:block"
                     >
                         <ChevronLeft className="text-white" />
                     </button>
-
                     <button
                         onClick={() => scroll('right')}
                         className="absolute top-1/2 right-0 hidden -translate-y-1/2 rounded-full bg-neutral-900 p-3 transition hover:bg-neutral-800 md:block"
@@ -101,10 +80,13 @@ export default function Reviews() {
                                     “{review.message}”
                                 </p>
 
-                                {/* Client */}
+                                {/* Client Info */}
                                 <div className="flex items-center gap-4 border-t border-neutral-800 pt-4">
                                     <img
-                                        src={review.avatar}
+                                        src={
+                                            review.avatar ??
+                                            '/images/client.jpg'
+                                        }
                                         alt={review.name}
                                         className="h-12 w-12 rounded-full object-cover"
                                     />
@@ -113,7 +95,7 @@ export default function Reviews() {
                                             {review.name}
                                         </p>
                                         <p className="text-sm text-gray-400">
-                                            {review.role}
+                                            {review.company}
                                         </p>
                                     </div>
                                 </div>

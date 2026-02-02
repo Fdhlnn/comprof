@@ -1,31 +1,17 @@
 import { Link } from '@inertiajs/react';
 import MainLayout from '@/layouts/main-layout';
 
-const products = [
-    {
-        id: 1,
-        name: 'Faith Industries "Berserker Rage" White Tshirt',
-        price: 199000,
-        image: '/images/t-shirt1.jpg',
-    },
-    {
-        id: 2,
-        name: 'Faith Industries "Fenix The Hollow" Red Jersey',
-        price: 349000,
-        image: '/images/t-shirt2.jpg',
-    },
-    {
-        id: 3,
-        name: 'Faith Industries "Judgment Chain" Tracktop Tang Jacket',
-        price: 149000,
-        image: '/images/t-shirt3.jpg',
-    },
-];
+type ProductItem = {
+    id: number;
+    name: string;
+    price: number;
+    image?: string;
+};
 
-export default function Products() {
+export default function Products({ products }: { products: ProductItem[] }) {
     return (
         <MainLayout>
-            <section className="space-y-8">
+            <section className="space-y-8 py-24">
                 <div className="space-y-2 text-center">
                     <h1 className="text-3xl font-bold">Our Products</h1>
                     <p className="mx-auto max-w-xl text-muted-foreground">
@@ -42,11 +28,15 @@ export default function Products() {
                             className="group overflow-hidden rounded-xl border bg-background transition hover:shadow-lg"
                         >
                             <div className="aspect-square overflow-hidden bg-muted">
-                                <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    className="h-full w-full object-cover transition group-hover:scale-105"
-                                />
+                                {product.image ? (
+                                    <img
+                                        src={product.image}
+                                        alt={product.name}
+                                        className="h-full w-full object-cover transition group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <div className="h-full w-full bg-gray-200" />
+                                )}
                             </div>
 
                             <div className="space-y-1 p-4">

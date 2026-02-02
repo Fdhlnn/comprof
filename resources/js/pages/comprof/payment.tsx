@@ -1,42 +1,39 @@
+import { Head, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import MainLayout from '@/layouts/main-layout';
 
-const PRODUCTS: any = {
-    1: {
-        name: 'Berserker Rage White Tshirt',
-        image: '/images/t-shirt1.jpg',
-    },
-    2: {
-        name: 'Fenix The Hollow Red Jersey',
-        image: '/images/t-shirt2.jpg',
-    },
-    3: {
-        name: 'Judgment Chain Tracktop Jacket',
-        image: '/images/t-shirt3.jpg',
-    },
+type ProductItem = {
+    id: number;
+    name: string;
+    image?: string;
+    sizes: { label: string; price: number }[];
 };
 
-const sizes = [
-    { label: 'S', price: 199000 },
-    { label: 'M', price: 209000 },
-    { label: 'L', price: 219000 },
-    { label: 'XL', price: 229000 },
-];
+export default function Payment() {
+    // ambil data produk dari Inertia page props
+    const { product }: { product: ProductItem } = usePage().props;
 
-export default function Payment({ id }: { id: number }) {
-    const product = PRODUCTS[id];
     const [selectedSize, setSelectedSize] = useState<number | null>(null);
 
     return (
         <MainLayout>
-            <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-2">
+            <Head title={product.name} />
+
+            <div className="mx-auto grid max-w-5xl gap-8 py-24 md:grid-cols-2">
                 {/* IMAGE */}
-                <img
-                    src={product.image}
-                    className="rounded-xl border object-cover"
-                />
+                <div className="overflow-hidden rounded-xl border">
+                    {product.image ? (
+                        <img
+                            src={product.image}
+                            alt={product.name}
+                            className="h-full w-full object-cover"
+                        />
+                    ) : (
+                        <div className="h-96 w-full bg-gray-200" />
+                    )}
+                </div>
 
                 {/* DETAIL */}
                 <div className="space-y-6">
@@ -46,7 +43,7 @@ export default function Payment({ id }: { id: number }) {
                     <div className="space-y-3">
                         <p className="font-medium">Pilih Ukuran</p>
                         <div className="grid grid-cols-4 gap-3">
-                            {sizes.map((size, i) => (
+                            {product.sizes.map((size, i) => (
                                 <Card
                                     key={i}
                                     onClick={() => setSelectedSize(i)}
@@ -79,9 +76,9 @@ export default function Payment({ id }: { id: number }) {
                                 </p>
                                 <p className="text-xl font-bold">
                                     Rp{' '}
-                                    {sizes[selectedSize].price.toLocaleString(
-                                        'id-ID',
-                                    )}
+                                    {product.sizes[
+                                        selectedSize
+                                    ].price.toLocaleString('id-ID')}
                                 </p>
                             </div>
 

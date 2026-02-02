@@ -4,38 +4,15 @@ import MainLayout from '@/layouts/main-layout';
 
 type EventStatus = 'upcoming' | 'ongoing' | 'past';
 
-const events = [
-    {
-        id: 1,
-        title: 'Faith Industries Pop-Up Store',
-        date: '15 – 20 Februari 2026',
-        location: 'Jakarta Selatan',
-        image: '/images/events-1.png',
-        status: 'upcoming' as EventStatus,
-        description:
-            'Pop-up store eksklusif menghadirkan koleksi terbaru dan limited edition Faith Industries.',
-    },
-    {
-        id: 2,
-        title: 'Streetwear Launching Night',
-        date: '5 Januari 2026',
-        location: 'Bandung',
-        image: '/images/events-2.jpg',
-        status: 'past' as EventStatus,
-        description:
-            'Malam peluncuran koleksi terbaru dengan showcase desain dan komunitas kreatif.',
-    },
-    {
-        id: 3,
-        title: 'Creative Collaboration Session',
-        date: '25 Maret 2026',
-        location: 'Online Event',
-        image: '/images/events-3.png',
-        status: 'upcoming' as EventStatus,
-        description:
-            'Sesi diskusi dan kolaborasi antara Faith Industries dengan kreator lokal.',
-    },
-];
+type EventItem = {
+    id: number;
+    title: string;
+    description: string;
+    date: string;
+    location?: string;
+    image?: string;
+    status: EventStatus;
+};
 
 const statusStyle: Record<EventStatus, string> = {
     upcoming: 'bg-blue-500/10 text-blue-500',
@@ -43,7 +20,7 @@ const statusStyle: Record<EventStatus, string> = {
     past: 'bg-neutral-500/10 text-neutral-400',
 };
 
-export default function Events() {
+export default function Events({ events }: { events: EventItem[] }) {
     return (
         <MainLayout>
             <Head title="Events" />
@@ -62,7 +39,7 @@ export default function Events() {
                     </div>
 
                     {/* Event List */}
-                    <div className="grid gap-10 md:grid-cols-2">
+                    <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
                         {events.map((event) => (
                             <div
                                 key={event.id}
@@ -70,11 +47,15 @@ export default function Events() {
                             >
                                 {/* Image */}
                                 <div className="overflow-hidden">
-                                    <img
-                                        src={event.image}
-                                        alt={event.title}
-                                        className="h-60 w-full object-cover transition duration-300 group-hover:scale-105"
-                                    />
+                                    {event.image ? (
+                                        <img
+                                            src={event.image}
+                                            alt={event.title}
+                                            className="h-60 w-full object-cover transition duration-300 group-hover:scale-105"
+                                        />
+                                    ) : (
+                                        <div className="h-60 w-full bg-gray-200" />
+                                    )}
                                 </div>
 
                                 {/* Content */}

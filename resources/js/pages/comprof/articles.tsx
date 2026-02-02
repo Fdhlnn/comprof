@@ -1,42 +1,15 @@
 import { Head, Link } from '@inertiajs/react';
 import MainLayout from '@/layouts/main-layout';
 
-const articles = [
-    {
-        id: 1,
-        title: 'Behind the Design: Filosofi Faith Industries',
-        excerpt:
-            'Setiap desain yang kami rilis membawa cerita, nilai, dan identitas yang ingin kami sampaikan.',
-        image: '/images/article.png',
-        date: '12 Jan 2026',
-    },
-    {
-        id: 2,
-        title: 'Kenapa Limited Edition Itu Penting?',
-        excerpt:
-            'Produk terbatas bukan sekadar eksklusivitas, tapi juga bentuk apresiasi terhadap kualitas.',
-        image: '/images/article.png',
-        date: '20 Jan 2026',
-    },
-    {
-        id: 3,
-        title: 'Streetwear & Lifestyle: Lebih dari Sekadar Fashion',
-        excerpt:
-            'Streetwear adalah medium ekspresi diri dan budaya urban yang terus berkembang.',
-        image: '/images/article.png',
-        date: '28 Jan 2026',
-    },
-    {
-        id: 4,
-        title: 'Proses Produksi Merchandise Faith Industries',
-        excerpt:
-            'Dari pemilihan bahan hingga quality control, semua kami lakukan dengan standar tinggi.',
-        image: '/images/article.png',
-        date: '2 Feb 2026',
-    },
-];
+type ArticleItem = {
+    id: number;
+    title: string;
+    excerpt: string;
+    image?: string | null;
+    date: string;
+};
 
-export default function Articles() {
+export default function Articles({ articles }: { articles: ArticleItem[] }) {
     return (
         <MainLayout>
             <Head title="Articles" />
@@ -64,11 +37,15 @@ export default function Articles() {
                             >
                                 {/* Image */}
                                 <div className="overflow-hidden">
-                                    <img
-                                        src={article.image}
-                                        alt={article.title}
-                                        className="h-56 w-full object-cover transition duration-300 group-hover:scale-105"
-                                    />
+                                    {article.image ? (
+                                        <img
+                                            src={article.image}
+                                            alt={article.title}
+                                            className="h-56 w-full object-cover transition duration-300 group-hover:scale-105"
+                                        />
+                                    ) : (
+                                        <div className="h-56 w-full bg-gray-200" />
+                                    )}
                                 </div>
 
                                 {/* Content */}

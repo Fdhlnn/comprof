@@ -5,21 +5,33 @@ use Inertia\Inertia;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Products\AdminProductsController;
 use App\Http\Controllers\Articles\AdminArticlesController;
+use App\Http\Controllers\Articles\UserArticlesController;
 use App\Http\Controllers\Gallery\AdminGalleryController;
 use App\Http\Controllers\Events\AdminEventsController;
 use App\Http\Controllers\Clients\AdminClientsController;
 use App\Http\Controllers\Dashboard\AdminDashboardController;
+use App\Http\Controllers\Events\UserEventsController;
+use App\Http\Controllers\Products\UserProductsController;
+use App\Http\Controllers\Clients\UserClientsController;
+use App\Http\Controllers\Gallery\UserGalleryController;
 
-
+//user
 Route::get('/', fn() => Inertia::render('comprof/home'))->name('home');
 Route::get('/about', fn() => Inertia::render('comprof/about-us'));
-Route::get('/products', fn() => Inertia::render('comprof/products'));
-Route::get('/clients', fn() => Inertia::render('comprof/clients'));
-Route::get('/articles', fn() => Inertia::render('comprof/articles'));
-Route::get('/gallery', fn() => Inertia::render('comprof/gallery'));
-Route::get('/events', fn() => Inertia::render('comprof/events'));
+Route::get('/profile', fn() => Inertia::render('comprof/profile'));
+Route::get('/clients', [UserClientsController::class, 'index'])->name('comprof.clients');
+
+Route::get('/products', [UserProductsController::class, 'index'])->name('comprof.products');
+Route::get('/payment/{product}', [UserProductsController::class, 'show'])->name('comprof.payment');
+
+Route::get('/articles', [UserArticlesController::class, 'index'])->name('comprof.articles');
+Route::get('/articles/{id}', [UserArticlesController::class, 'show']);
+
+Route::get('/events', [UserEventsController::class, 'index'])->name('comprof.events');
+
+Route::get('/gallery', [UserGalleryController::class, 'index'])->name('comprof.gallery');
+
 Route::get('/contact', fn() => Inertia::render('comprof/contact'));
-Route::get('/payment/{id}', fn($id) => Inertia::render('comprof/payment', ['id' => (int) $id]))->name('payment');
 
 
 

@@ -62,7 +62,7 @@ export default function About() {
                     {/* Image 2 */}
                     <div className="flex items-center justify-center">
                         <img
-                            src="/images/logo.png"
+                            src="/images/location.png"
                             alt="Visi dan Misi"
                             className="w-full max-w-md rounded-lg object-cover"
                         />
