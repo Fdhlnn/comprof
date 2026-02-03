@@ -16,7 +16,7 @@ use App\Http\Controllers\Clients\UserClientsController;
 use App\Http\Controllers\Gallery\UserGalleryController;
 
 //user
-Route::get('/', fn() => Inertia::render('comprof/home'))->name('home');
+Route::get('/home', fn() => Inertia::render('comprof/home'))->name('home');
 Route::get('/about', fn() => Inertia::render('comprof/about-us'));
 Route::get('/profile', fn() => Inertia::render('comprof/profile'));
 Route::get('/clients', [UserClientsController::class, 'index'])->name('comprof.clients');
