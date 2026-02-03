@@ -31,7 +31,7 @@ Route::get('/events', [UserEventsController::class, 'index'])->name('comprof.eve
 
 Route::get('/gallery', [UserGalleryController::class, 'index'])->name('comprof.gallery');
 
-Route::get('/contact', fn() => Inertia::render('comprof/contact'));
+Route::get('/contacts', fn() => Inertia::render('comprof/contacts'));
 
 
 

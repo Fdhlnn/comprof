@@ -25,8 +25,8 @@ export default function Contact() {
                     <div className="mb-16 text-center">
                         <h1 className="mb-4 text-3xl font-bold">Contact Us</h1>
                         <p className="text-muted-foreground">
-                            Hubungi Faith Industries untuk kolaborasi atau
-                            pertanyaan
+                            Tertarik bekerja sama atau punya pertanyaan? Jangan
+                            ragu untuk menghubungi Faith Industries.
                         </p>
                     </div>
 
@@ -34,7 +34,7 @@ export default function Contact() {
                         {/* INFO */}
                         <div className="space-y-6">
                             {/* LOGO + NAME */}
-                            <div className="space-y-2">
+                            <div className="space-y-1">
                                 <img
                                     src="/images/logo.png"
                                     alt="Faith Industries"

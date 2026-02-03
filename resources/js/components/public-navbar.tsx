@@ -49,8 +49,8 @@ export function AppNavbar() {
                     <Link href="/gallery" className="hover:text-neutral-300">
                         Gallery
                     </Link>
-                    <Link href="/contact" className="hover:text-neutral-300">
-                        Contact
+                    <Link href="/contacts" className="hover:text-neutral-300">
+                        Contacts
                     </Link>
                 </nav>
 
