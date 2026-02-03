@@ -30,6 +30,7 @@ Route::get('/articles', [UserArticlesController::class, 'index'])->name('comprof
 Route::get('/detail-article/{id}', [UserArticlesController::class, 'show'])->name('comprof.detail-article');
 
 Route::get('/events', [UserEventsController::class, 'index'])->name('comprof.events');
+Route::get('/detail-event/{id}', [UserEventsController::class, 'show'])->name('comprof.detail-event');
 
 Route::get('/gallery', [UserGalleryController::class, 'index'])->name('comprof.gallery');
 

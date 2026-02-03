@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Calendar, MapPin } from 'lucide-react';
 import MainLayout from '@/layouts/main-layout';
 
@@ -43,7 +43,10 @@ export default function Events({ events }: { events: EventItem[] }) {
                         {events.map((event) => (
                             <div
                                 key={event.id}
-                                className="group overflow-hidden rounded-2xl border bg-card transition hover:shadow-lg"
+                                onClick={() =>
+                                    router.visit(`/detail-event/${event.id}`)
+                                }
+                                className="group cursor-pointer overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:shadow-xl active:scale-[0.98]"
                             >
                                 {/* Image */}
                                 <div className="overflow-hidden">
@@ -54,25 +57,23 @@ export default function Events({ events }: { events: EventItem[] }) {
                                             className="h-60 w-full object-cover transition duration-300 group-hover:scale-105"
                                         />
                                     ) : (
-                                        <div className="h-60 w-full bg-gray-200" />
+                                        <div className="h-60 w-full bg-muted" />
                                     )}
                                 </div>
 
                                 {/* Content */}
                                 <div className="p-6">
-                                    <div className="mb-4 flex items-center gap-3">
-                                        <span
-                                            className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyle[event.status]}`}
-                                        >
-                                            {event.status.toUpperCase()}
-                                        </span>
-                                    </div>
+                                    <span
+                                        className={`mb-3 inline-block rounded-full px-3 py-1 text-xs font-medium ${statusStyle[event.status]}`}
+                                    >
+                                        {event.status.toUpperCase()}
+                                    </span>
 
                                     <h3 className="mb-3 text-xl font-semibold">
                                         {event.title}
                                     </h3>
 
-                                    <p className="mb-6 text-muted-foreground">
+                                    <p className="mb-6 line-clamp-3 text-muted-foreground">
                                         {event.description}
                                     </p>
 
@@ -81,10 +82,13 @@ export default function Events({ events }: { events: EventItem[] }) {
                                             <Calendar size={16} />
                                             {event.date}
                                         </span>
-                                        <span className="flex items-center gap-2">
-                                            <MapPin size={16} />
-                                            {event.location}
-                                        </span>
+
+                                        {event.location && (
+                                            <span className="flex items-center gap-2">
+                                                <MapPin size={16} />
+                                                {event.location}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
