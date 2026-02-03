@@ -12,10 +12,29 @@ type ProductItem = {
 };
 
 export default function Payment() {
-    // ambil data produk dari Inertia page props
     const { product }: { product: ProductItem } = usePage().props;
-
     const [selectedSize, setSelectedSize] = useState<number | null>(null);
+
+    const handleBayarSekarang = () => {
+        if (selectedSize === null) return;
+
+        const size = product.sizes[selectedSize];
+
+        const phoneNumber = '6285697779977';
+        const message = `
+Halo, saya mau pesan:
+
+Produk: ${product.name}
+Ukuran: ${size.label}
+Harga: Rp ${size.price.toLocaleString('id-ID')}
+        `;
+
+        const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+            message,
+        )}`;
+
+        window.open(waUrl, '_blank');
+    };
 
     return (
         <MainLayout>
@@ -47,10 +66,10 @@ export default function Payment() {
                                 <Card
                                     key={i}
                                     onClick={() => setSelectedSize(i)}
-                                    className={`cursor-pointer text-center ${
+                                    className={`cursor-pointer text-center transition ${
                                         selectedSize === i
                                             ? 'border-primary ring-2 ring-primary'
-                                            : ''
+                                            : 'hover:border-muted'
                                     }`}
                                 >
                                     <CardContent className="py-4">
@@ -82,7 +101,9 @@ export default function Payment() {
                                 </p>
                             </div>
 
-                            <Button size="lg">Bayar Sekarang</Button>
+                            <Button size="lg" onClick={handleBayarSekarang}>
+                                Bayar Sekarang
+                            </Button>
                         </div>
                     )}
                 </div>

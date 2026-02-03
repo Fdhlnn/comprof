@@ -11,7 +11,7 @@ const slides = [
 export default function Home() {
     const [current, setCurrent] = useState(0);
 
-    // Autoplay setiap 5 detik
+    
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrent((prev) => (prev + 1) % slides.length);
