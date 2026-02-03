@@ -42,7 +42,7 @@ export default function AdminContacts({ messages, filters }: any) {
                     </div>
 
                     {unreadCount > 0 && (
-                        <span className="rounded-full bg-primary px-3 py-1 text-sm text-white">
+                        <span className="rounded-full bg-primary px-3 py-1 text-sm text-black">
                             {unreadCount} Unread
                         </span>
                     )}
@@ -78,7 +78,7 @@ export default function AdminContacts({ messages, filters }: any) {
                             }`}
                         >
                             {!item.read && (
-                                <span className="absolute top-4 right-4 rounded-full bg-primary px-2 py-1 text-xs text-white">
+                                <span className="absolute top-4 right-4 rounded-full bg-primary px-2 py-1 text-xs text-black">
                                     NEW
                                 </span>
                             )}

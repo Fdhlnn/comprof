@@ -1,5 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone, X } from 'lucide-react';
+import { useState } from 'react';
 import MainLayout from '@/layouts/main-layout';
 
 export default function Contact() {
@@ -9,10 +10,17 @@ export default function Contact() {
         message: '',
     });
 
+    const [showSuccess, setShowSuccess] = useState(false);
+
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/contacts', {
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                setShowSuccess(true);
+                // otomatis hilang setelah 3 detik
+                setTimeout(() => setShowSuccess(false), 3000);
+            },
         });
     };
 
@@ -33,7 +41,6 @@ export default function Contact() {
                     <div className="grid gap-12 md:grid-cols-2">
                         {/* INFO */}
                         <div className="space-y-6">
-                            {/* LOGO + NAME */}
                             <div className="space-y-1">
                                 <img
                                     src="/images/logo.png"
@@ -72,7 +79,7 @@ export default function Contact() {
                         {/* FORM */}
                         <form
                             onSubmit={submit}
-                            className="space-y-6 rounded-2xl border bg-card p-8"
+                            className="relative space-y-6 rounded-2xl border bg-card p-8"
                         >
                             <input
                                 placeholder="Name"
@@ -108,6 +115,19 @@ export default function Contact() {
                             >
                                 Send Message
                             </button>
+
+                            {/* POPUP SUKSES */}
+                            {showSuccess && (
+                                <div className="absolute top-4 right-4 flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-white shadow-lg">
+                                    <span>Message sent successfully!</span>
+                                    <button
+                                        onClick={() => setShowSuccess(false)}
+                                        className="ml-2"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            )}
                         </form>
                     </div>
                 </div>

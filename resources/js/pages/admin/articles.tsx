@@ -157,14 +157,14 @@ export default function Articles({ articles }: { articles: Article[] }) {
 
                 {/* MODAL */}
                 <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogContent className="max-w-lg">
+                    <DialogContent className="max-h-[90vh] max-w-lg overflow-hidden">
                         <DialogHeader>
                             <DialogTitle>
                                 {editing ? 'Edit Article' : 'Add Article'}
                             </DialogTitle>
                         </DialogHeader>
 
-                        <div className="grid gap-4 py-4">
+                        <div className="grid max-h-[65vh] gap-4 overflow-y-auto py-4 pr-2">
                             <Input
                                 placeholder="Title"
                                 value={data.title}
@@ -174,7 +174,7 @@ export default function Articles({ articles }: { articles: Article[] }) {
                             />
 
                             <Textarea
-                                rows={6}
+                                rows={10}
                                 placeholder="Content"
                                 value={data.content}
                                 onChange={(e) =>

@@ -11,16 +11,15 @@ class AdminContactsController extends Controller
 {
     public function index(Request $request)
     {
-        $search = $request->query('search');
+        $search = $request->search;
 
-        $messages = Contacts::query()
-            ->when($search, function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('message', 'like', "%{$search}%");
-            })
+        $messages = Contacts::when($search, function ($query) use ($search) {
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('message', 'like', "%{$search}%");
+        })
             ->orderBy('read', 'asc')
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->paginate(9)
             ->withQueryString();
 
@@ -33,18 +32,15 @@ class AdminContactsController extends Controller
         ]);
     }
 
-
     public function markAsRead(Contacts $contact)
     {
         $contact->update(['read' => true]);
-
         return back();
     }
 
     public function destroy(Contacts $contact)
-    {   
+    {
         $contact->delete();
-
-        return back()->with('success', 'Pesan berhasil dihapus');
+        return back()->with('success', 'Pesan dihapus');
     }
 }

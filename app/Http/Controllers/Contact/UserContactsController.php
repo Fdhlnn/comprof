@@ -17,18 +17,17 @@ class UserContactsController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'    => 'required|string|max:255',
-            'email'   => 'required|email|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
             'message' => 'required|string',
         ]);
 
         Contacts::create([
-            'name'    => $validated['name'],
-            'email'   => $validated['email'],
+            'name' => $validated['name'],
+            'email' => $validated['email'],
             'message' => $validated['message'],
-            'read'    => false,
         ]);
 
-        return redirect()->back()->with('success', 'Pesan berhasil dikirim!');
+        return back();
     }
 }

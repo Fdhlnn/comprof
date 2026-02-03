@@ -26,7 +26,7 @@ class UserProductsController extends Controller
 
     public function show(Products $product)
     {
-        // contoh sizes, bisa diubah sesuai kebutuhan / database nanti
+        
         $sizes = [
             ['label' => 'S', 'price' => $product->price],
             ['label' => 'M', 'price' => $product->price + 10000],

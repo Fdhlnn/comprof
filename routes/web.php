@@ -13,7 +13,9 @@ use App\Http\Controllers\Dashboard\AdminDashboardController;
 use App\Http\Controllers\Events\UserEventsController;
 use App\Http\Controllers\Products\UserProductsController;
 use App\Http\Controllers\Clients\UserClientsController;
+use App\Http\Controllers\Contact\UserContactsController;
 use App\Http\Controllers\Gallery\UserGalleryController;
+use App\Http\Controllers\Contact\AdminContactsController;
 
 //user
 Route::get('/home', fn() => Inertia::render('comprof/home'))->name('home');
@@ -25,13 +27,14 @@ Route::get('/products', [UserProductsController::class, 'index'])->name('comprof
 Route::get('/payment/{product}', [UserProductsController::class, 'show'])->name('comprof.payment');
 
 Route::get('/articles', [UserArticlesController::class, 'index'])->name('comprof.articles');
-Route::get('/articles/{id}', [UserArticlesController::class, 'show']);
+Route::get('/detail-article/{id}', [UserArticlesController::class, 'show'])->name('comprof.detail-article');
 
 Route::get('/events', [UserEventsController::class, 'index'])->name('comprof.events');
 
 Route::get('/gallery', [UserGalleryController::class, 'index'])->name('comprof.gallery');
 
-Route::get('/contacts', fn() => Inertia::render('comprof/contacts'));
+Route::get('/contacts', [UserContactsController::class,'index'])->name('comprof.contacts');
+Route::post('/contacts', [UserContactsController::class, 'store']);
 
 
 
@@ -68,6 +71,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::post('/clients', [AdminClientsController::class, 'store']);
     Route::put('/clients/{clients}', [AdminClientsController::class, 'update']);
     Route::delete('/clients/{clients}', [AdminClientsController::class, 'destroy']);
+
+    Route::get('/contacts', [AdminContactsController::class, 'index'])->name('admin.contacts');
+    Route::post('/contacts/{contact}/read', [AdminContactsController::class, 'markAsRead']);
+    Route::delete('/contacts/{contact}', [AdminContactsController::class, 'destroy']);
 });
 
 require __DIR__ . '/settings.php';

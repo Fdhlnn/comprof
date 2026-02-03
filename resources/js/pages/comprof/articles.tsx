@@ -32,7 +32,7 @@ export default function Articles({ articles }: { articles: ArticleItem[] }) {
                         {articles.map((article) => (
                             <Link
                                 key={article.id}
-                                href={`/articles/${article.id}`}
+                                href={`/detail-article/${article.id}`}
                                 className="group overflow-hidden rounded-2xl border bg-card transition hover:shadow-lg"
                             >
                                 {/* Image */}

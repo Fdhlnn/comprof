@@ -25,7 +25,7 @@ export function AppNavbar() {
 
                 {/* Navigation */}
                 <nav className="flex items-center gap-8 text-sm text-white">
-                    <Link href="/" className="hover:text-neutral-300">
+                    <Link href="/home" className="hover:text-neutral-300">
                         Home
                     </Link>
                     <Link href="/about" className="hover:text-neutral-300">
