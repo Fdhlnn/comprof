@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Contacts;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Mail;
+
 
 class AdminContactsController extends Controller
 {
@@ -42,5 +44,22 @@ class AdminContactsController extends Controller
     {
         $contact->delete();
         return back()->with('success', 'Pesan dihapus');
+    }
+
+    public function reply(Request $request, Contacts $contact)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'message' => 'required|string',
+        ]);
+
+
+        Mail::raw($request->message, function ($mail) use ($request) {
+            $mail->to($request->email)
+                ->subject('Reply from Faith Industries');
+        });
+
+        return back()->with('success', 'Reply sent successfully!');
     }
 }

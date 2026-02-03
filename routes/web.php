@@ -74,6 +74,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 
     Route::get('/contacts', [AdminContactsController::class, 'index'])->name('admin.contacts');
     Route::post('/contacts/{contact}/read', [AdminContactsController::class, 'markAsRead']);
+    Route::post('/contacts/{contact}/reply', [AdminContactsController::class, 'reply']);
     Route::delete('/contacts/{contact}', [AdminContactsController::class, 'destroy']);
 });
 

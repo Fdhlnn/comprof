@@ -1,5 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { CheckCircle, Mail, Trash2, User } from 'lucide-react';
+import { CheckCircle, Mail, Send, Trash2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -25,6 +25,33 @@ export default function AdminContacts({ messages, filters }: any) {
         if (confirm('Hapus pesan ini?')) {
             router.delete(`/admin/contacts/${id}`);
         }
+    };
+
+    // 🔥 DIRECT OPEN GMAIL WEB
+    const replyViaGmail = (item: ContactMessage) => {
+        const subject = encodeURIComponent('Re: Contact from Faith Industries');
+
+        const body = encodeURIComponent(
+            `Hi ${item.name},\n\n` +
+                `Terima kasih sudah menghubungi Faith Industries.\n\n` +
+                `------------------------------\n` +
+                `Pesan Anda:\n"${item.message}"\n\n` +
+                `Best regards,\n` +
+                `Faith Industries`,
+        );
+
+        // auto mark as read
+        if (!item.read) {
+            markAsRead(item.id);
+        }
+
+        const gmailUrl =
+            `https://mail.google.com/mail/?view=cm&fs=1` +
+            `&to=${encodeURIComponent(item.email)}` +
+            `&su=${subject}` +
+            `&body=${body}`;
+
+        window.open(gmailUrl, '_blank');
     };
 
     return (
@@ -62,7 +89,7 @@ export default function AdminContacts({ messages, filters }: any) {
                     className="max-w-sm"
                 />
 
-                {/* List */}
+                {/* Messages */}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {messages.data.length === 0 && (
                         <p className="text-muted-foreground">
@@ -121,6 +148,14 @@ export default function AdminContacts({ messages, filters }: any) {
 
                                         <Button
                                             size="sm"
+                                            onClick={() => replyViaGmail(item)}
+                                        >
+                                            <Send className="mr-1 h-4 w-4" />
+                                            Reply
+                                        </Button>
+
+                                        <Button
+                                            size="sm"
                                             variant="destructive"
                                             onClick={() =>
                                                 deleteMessage(item.id)
@@ -142,8 +177,10 @@ export default function AdminContacts({ messages, filters }: any) {
                             key={i}
                             variant={link.active ? 'default' : 'outline'}
                             disabled={!link.url}
-                            onClick={() => router.visit(link.url)}
-                            dangerouslySetInnerHTML={{ __html: link.label }}
+                            onClick={() => link.url && router.visit(link.url)}
+                            dangerouslySetInnerHTML={{
+                                __html: link.label,
+                            }}
                         />
                     ))}
                 </div>
