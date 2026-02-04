@@ -18,7 +18,7 @@ use App\Http\Controllers\Gallery\UserGalleryController;
 use App\Http\Controllers\Contact\AdminContactsController;
 
 //user
-Route::get('/home', fn() => Inertia::render('comprof/home'))->name('home');
+Route::get('/', fn() => Inertia::render('comprof/home'))->name('home');
 Route::get('/about', fn() => Inertia::render('comprof/about-us'));
 Route::get('/profile', fn() => Inertia::render('comprof/profile'));
 Route::get('/clients', [UserClientsController::class, 'index'])->name('comprof.clients');
@@ -70,7 +70,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 
     Route::get('/clients', [AdminClientsController::class, 'index'])->name('admin.clients');
     Route::post('/clients', [AdminClientsController::class, 'store']);
-    Route::put('/clients/{clients}', [AdminClientsController::class, 'update']);
+    Route::put('/clients/{client}', [AdminClientsController::class, 'update']);
     Route::delete('/clients/{clients}', [AdminClientsController::class, 'destroy']);
 
     Route::get('/contacts', [AdminContactsController::class, 'index'])->name('admin.contacts');

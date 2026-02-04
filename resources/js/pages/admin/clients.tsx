@@ -1,6 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import { Star } from 'lucide-react';
 import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -23,71 +24,62 @@ type ClientItem = {
     name: string;
     company?: string;
     avatar?: string;
-    rating?: number;
-    message?: string;
+    rating: number;
+    message: string;
 };
 
 export default function Clients({ clients }: { clients: ClientItem[] }) {
     const [open, setOpen] = useState(false);
     const [editing, setEditing] = useState<ClientItem | null>(null);
 
-    const {
-        data,
-        setData,
-        post,
-        put,
-        delete: destroy,
-        reset,
-    } = useForm({
+    const form = useForm<{
+        name: string;
+        company: string;
+        avatar: File | null;
+        rating: number;
+        message: string;
+    }>({
         name: '',
         company: '',
-        avatar: null as File | null,
+        avatar: null,
         rating: 5,
         message: '',
     });
 
     const openCreate = () => {
-        reset();
+        form.reset();
         setEditing(null);
         setOpen(true);
     };
 
     const openEdit = (client: ClientItem) => {
         setEditing(client);
-        setData({
+        form.setData({
             name: client.name,
             company: client.company || '',
             avatar: null,
-            rating: client.rating || 5,
-            message: client.message || '',
+            rating: client.rating,
+            message: client.message,
         });
         setOpen(true);
     };
 
     const submit = () => {
-        const formData = new FormData();
-        formData.append('name', data.name);
-        formData.append('company', data.company);
-        formData.append('rating', data.rating.toString());
-        formData.append('message', data.message);
-        if (data.avatar) formData.append('avatar', data.avatar);
-
         if (editing) {
-            formData.append('_method', 'PUT');
-            put(`/admin/clients/${editing.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+            form.put(`/admin/clients/${editing.id}`, {
+                forceFormData: true,
                 onSuccess: () => {
                     setOpen(false);
-                    reset();
+                    form.reset();
                     setEditing(null);
                 },
             });
         } else {
-            post('/admin/clients', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+            form.post('/admin/clients', {
+                forceFormData: true,
                 onSuccess: () => {
                     setOpen(false);
-                    reset();
+                    form.reset();
                 },
             });
         }
@@ -96,9 +88,7 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
     const handleDelete = (id: number) => {
         if (!confirm('Hapus client ini?')) return;
 
-        destroy(`/admin/clients/${id}`, {
-            onSuccess: () => {},
-        });
+        form.delete(`/admin/clients/${id}`);
     };
 
     return (
@@ -134,13 +124,13 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
                                     </td>
                                 </tr>
                             )}
-                            {clients.map((client) => (
-                                <tr key={client.id} className="border-t">
+
+                            {clients.map((clients) => (
+                                <tr key={clients.id} className="border-t">
                                     <td className="px-4 py-3">
-                                        {client.avatar ? (
+                                        {clients.avatar ? (
                                             <img
-                                                src={`/storage/${client.avatar}`}
-                                                alt={client.name}
+                                                src={`/storage/${clients.avatar}`}
                                                 className="h-12 w-12 rounded-full object-cover"
                                             />
                                         ) : (
@@ -149,11 +139,13 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
                                             </span>
                                         )}
                                     </td>
-                                    <td className="px-4 py-3">{client.name}</td>
-                                    <td className="px-4 py-3">{client.company}</td>
+                                    <td className="px-4 py-3">{clients.name}</td>
+                                    <td className="px-4 py-3">
+                                        {clients.company}
+                                    </td>
                                     <td className="flex gap-1 px-4 py-3">
                                         {Array.from({
-                                            length: client.rating || 0,
+                                            length: clients.rating,
                                         }).map((_, i) => (
                                             <Star
                                                 key={i}
@@ -163,13 +155,13 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
                                         ))}
                                     </td>
                                     <td className="px-4 py-3">
-                                        {client.message}
+                                        {clients.message}
                                     </td>
                                     <td className="flex gap-2 px-4 py-3">
                                         <Button
                                             size="sm"
                                             variant="secondary"
-                                            onClick={() => openEdit(client)}
+                                            onClick={() => openEdit(clients)}
                                         >
                                             Edit
                                         </Button>
@@ -177,7 +169,7 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
                                             size="sm"
                                             variant="destructive"
                                             onClick={() =>
-                                                handleDelete(client.id)
+                                                handleDelete(clients.id)
                                             }
                                         >
                                             Delete
@@ -200,54 +192,56 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
                         <div className="grid gap-4 py-4">
                             <Input
                                 placeholder="Name"
-                                value={data.name}
+                                value={form.data.name}
                                 onChange={(e) =>
-                                    setData('name', e.target.value)
+                                    form.setData('name', e.target.value)
                                 }
                             />
+
                             <Input
                                 placeholder="Company"
-                                value={data.company}
+                                value={form.data.company}
                                 onChange={(e) =>
-                                    setData('company', e.target.value)
+                                    form.setData('company', e.target.value)
                                 }
                             />
+
                             <Input
                                 type="number"
-                                placeholder="Rating"
-                                value={data.rating}
                                 min={1}
                                 max={5}
+                                placeholder="Rating"
+                                value={form.data.rating}
                                 onChange={(e) =>
-                                    setData('rating', Number(e.target.value))
+                                    form.setData(
+                                        'rating',
+                                        Number(e.target.value),
+                                    )
                                 }
                             />
+
                             <Textarea
                                 placeholder="Message"
-                                value={data.message}
+                                value={form.data.message}
                                 onChange={(e) =>
-                                    setData('message', e.target.value)
+                                    form.setData('message', e.target.value)
                                 }
                             />
+
                             <Input
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) =>
-                                    setData(
+                                    form.setData(
                                         'avatar',
                                         e.target.files?.[0] || null,
                                     )
                                 }
                             />
 
-                            {data.avatar && (
+                            {form.data.avatar && (
                                 <img
-                                    src={
-                                        typeof data.avatar === 'string'
-                                            ? data.avatar
-                                            : URL.createObjectURL(data.avatar)
-                                    }
-                                    alt="Preview"
+                                    src={URL.createObjectURL(form.data.avatar)}
                                     className="h-32 w-full rounded object-cover"
                                 />
                             )}
@@ -258,7 +252,7 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
                                 variant="secondary"
                                 onClick={() => {
                                     setOpen(false);
-                                    reset();
+                                    form.reset();
                                     setEditing(null);
                                 }}
                             >

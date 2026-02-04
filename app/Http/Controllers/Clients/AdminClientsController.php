@@ -26,7 +26,7 @@ class AdminClientsController extends Controller
             'company'    => 'nullable|string',
             'message' => 'required|string',
             'rating'  => 'required|integer|min:1|max:5',
-            'avatar'  => 'required|image|max:2048',
+            'avatar'  => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('avatar')) {
@@ -43,21 +43,24 @@ class AdminClientsController extends Controller
     {
         $data = $request->validate([
             'name'    => 'required|string',
-            'company'    => 'nullable|string',
+            'company' => 'nullable|string',
             'message' => 'required|string',
             'rating'  => 'required|integer|min:1|max:5',
-            'avatar'  => 'required|image|max:2048',
+            'avatar'  => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('avatar')) {
-            Storage::disk('public')->delete($client->avatar);
+            Storage::disk('public')->delete($client->image);
             $data['avatar'] = $request->file('avatar')->store('clients', 'public');
+        } else {
+            unset($data['image']);
         }
 
         $client->update($data);
 
-        return redirect()->back();
+        return back();
     }
+
 
 
     public function destroy(Clients $clients)

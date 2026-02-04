@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('company')->nullable();
-            $table->string('avatar');
+            $table->string('avatar')->nullable();
             $table->tinyInteger('rating')->default(5);
             $table->text('message');
             $table->timestamps();
