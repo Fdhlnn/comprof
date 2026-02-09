@@ -20,7 +20,7 @@ class AdminGalleryController extends Controller
     {
         $data = $request->validate([
             'title'  => 'required|string',
-            'image' => 'required|image|max:2048',
+            'image' => 'nullable|image|max:2048',
         ]);
 
         $data['image'] = $request->file('image')->store('gallery', 'public');

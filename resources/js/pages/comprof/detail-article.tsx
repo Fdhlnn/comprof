@@ -1,4 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
+import { ArrowUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import MainLayout from '@/layouts/main-layout';
 
 type ArticleDetailProps = {
@@ -11,6 +13,24 @@ type ArticleDetailProps = {
 };
 
 export default function ArticleDetail({ article }: ArticleDetailProps) {
+    const [showTop, setShowTop] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowTop(window.scrollY > 300);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
+    };
+
     return (
         <MainLayout>
             <Head title={article.title} />
@@ -50,6 +70,17 @@ export default function ArticleDetail({ article }: ArticleDetailProps) {
                     </article>
                 </div>
             </section>
+
+            {/* Back To Top */}
+            {showTop && (
+                <button
+                    onClick={scrollToTop}
+                    aria-label="Back to top"
+                    className="fixed right-6 bottom-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all hover:scale-110 hover:shadow-xl"
+                >
+                    <ArrowUp className="h-5 w-5" />
+                </button>
+            )}
         </MainLayout>
     );
 }

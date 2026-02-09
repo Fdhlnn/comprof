@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
-import { useRef } from 'react';
+import { Star } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import MainLayout from '@/layouts/main-layout';
 
 type Client = {
@@ -14,22 +14,36 @@ type Client = {
 
 export default function Clients({ reviews }: { reviews: Client[] }) {
     const sliderRef = useRef<HTMLDivElement>(null);
+    const speed = 0.5;
 
-    const scroll = (direction: 'left' | 'right') => {
-        if (!sliderRef.current) return;
-        sliderRef.current.scrollBy({
-            left: direction === 'left' ? -350 : 350,
-            behavior: 'smooth',
-        });
-    };
+    useEffect(() => {
+        const slider = sliderRef.current;
+        if (!slider) return;
+
+        let animationId: number;
+
+        const startScroll = () => {
+            slider.scrollLeft += speed;
+
+            
+            if (slider.scrollLeft >= slider.scrollWidth / 2) {
+                slider.scrollLeft = 0;
+            }
+
+            animationId = requestAnimationFrame(startScroll);
+        };
+
+        animationId = requestAnimationFrame(startScroll);
+
+        return () => cancelAnimationFrame(animationId);
+    }, []);
 
     return (
         <MainLayout>
             <Head title="Client Reviews" />
 
-            <section className="bg-black py-24">
-                <div className="relative mx-auto max-w-6xl px-6">
-                    {/* Header */}
+            <section className="overflow-hidden bg-black py-24">
+                <div className="mx-auto max-w-6xl px-6">
                     <h2 className="mb-4 text-center text-3xl font-bold text-white md:text-4xl">
                         Client Reviews
                     </h2>
@@ -38,56 +52,38 @@ export default function Clients({ reviews }: { reviews: Client[] }) {
                         Industries.
                     </p>
 
-                    {/* Navigation Buttons */}
-                    <button
-                        onClick={() => scroll('left')}
-                        className="absolute top-1/2 left-0 hidden -translate-y-1/2 rounded-full bg-neutral-900 p-3 transition hover:bg-neutral-800 md:block"
-                    >
-                        <ChevronLeft className="text-white" />
-                    </button>
-                    <button
-                        onClick={() => scroll('right')}
-                        className="absolute top-1/2 right-0 hidden -translate-y-1/2 rounded-full bg-neutral-900 p-3 transition hover:bg-neutral-800 md:block"
-                    >
-                        <ChevronRight className="text-white" />
-                    </button>
-
                     {/* Slider */}
                     <div
                         ref={sliderRef}
-                        className="scrollbar-hide flex snap-x snap-mandatory gap-8 overflow-x-auto scroll-smooth pb-4"
+                        className="scrollbar-hide flex gap-8 overflow-x-hidden"
                     >
-                        {reviews.map((review) => (
+                        {[...reviews, ...reviews].map((review, i) => (
                             <div
-                                key={review.id}
-                                className="min-w-[320px] snap-start rounded-2xl border border-neutral-800 bg-neutral-900 p-8 transition hover:border-white/20 md:min-w-[360px]"
+                                key={`${review.id}-${i}`}
+                                className="min-w-[360px] rounded-2xl border border-neutral-800 bg-neutral-900 p-8"
                             >
-                                {/* Rating */}
                                 <div className="mb-4 flex">
-                                    {Array.from({ length: review.rating }).map(
-                                        (_, i) => (
-                                            <Star
-                                                key={i}
-                                                size={18}
-                                                className="fill-yellow-400 text-yellow-400"
-                                            />
-                                        ),
-                                    )}
+                                    {Array.from({
+                                        length: review.rating,
+                                    }).map((_, i) => (
+                                        <Star
+                                            key={i}
+                                            size={18}
+                                            className="fill-yellow-400 text-yellow-400"
+                                        />
+                                    ))}
                                 </div>
 
-                                {/* Message */}
                                 <p className="mb-8 leading-relaxed text-gray-300 italic">
                                     “{review.message}”
                                 </p>
 
-                                {/* Client Info */}
                                 <div className="flex items-center gap-4 border-t border-neutral-800 pt-4">
                                     <img
                                         src={
                                             review.avatar ??
                                             '/images/client.jpg'
                                         }
-                                        alt={review.name}
                                         className="h-12 w-12 rounded-full object-cover"
                                     />
                                     <div>

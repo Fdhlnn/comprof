@@ -139,7 +139,9 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
                                             </span>
                                         )}
                                     </td>
-                                    <td className="px-4 py-3">{clients.name}</td>
+                                    <td className="px-4 py-3">
+                                        {clients.name}
+                                    </td>
                                     <td className="px-4 py-3">
                                         {clients.company}
                                     </td>
@@ -205,19 +207,17 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
                                     form.setData('company', e.target.value)
                                 }
                             />
-
                             <Input
                                 type="number"
                                 min={1}
                                 max={5}
-                                placeholder="Rating"
-                                value={form.data.rating}
-                                onChange={(e) =>
-                                    form.setData(
-                                        'rating',
-                                        Number(e.target.value),
-                                    )
-                                }
+                                value={form.data.rating || ''}
+                                onChange={(e) => {
+                                    const value = Number(e.target.value);
+                                    if (value >= 1 && value <= 5) {
+                                        form.setData('rating', value);
+                                    }
+                                }}
                             />
 
                             <Textarea

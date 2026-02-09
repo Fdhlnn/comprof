@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminClientsController extends Controller
 {
-
     public function index()
     {
         return Inertia::render('admin/clients', [
@@ -18,12 +17,11 @@ class AdminClientsController extends Controller
         ]);
     }
 
-
     public function store(Request $request)
     {
         $data = $request->validate([
             'name'    => 'required|string',
-            'company'    => 'nullable|string',
+            'company' => 'nullable|string',
             'message' => 'required|string',
             'rating'  => 'required|integer|min:1|max:5',
             'avatar'  => 'nullable|image|max:2048',
@@ -38,7 +36,6 @@ class AdminClientsController extends Controller
         return redirect()->back();
     }
 
-    // Update client review
     public function update(Request $request, Clients $client)
     {
         $data = $request->validate([
@@ -50,24 +47,27 @@ class AdminClientsController extends Controller
         ]);
 
         if ($request->hasFile('avatar')) {
-            Storage::disk('public')->delete($client->image);
+            if ($client->avatar) {
+                Storage::disk('public')->delete($client->avatar);
+            }
+
             $data['avatar'] = $request->file('avatar')->store('clients', 'public');
-        } else {
-            unset($data['image']);
         }
 
         $client->update($data);
 
-        return back();
+        return redirect()->back();
     }
 
 
-
-    public function destroy(Clients $clients)
+    public function destroy(Clients $client)
     {
-        Storage::disk('public')->delete($clients->avatar);
-        $clients->delete();
+        if ($client->avatar) {
+            Storage::disk('public')->delete($client->avatar);
+        }
 
-        return redirect()->route('admin.clients');
+        $client->delete();
+
+        return redirect()->back();
     }
 }

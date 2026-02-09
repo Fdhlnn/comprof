@@ -70,8 +70,9 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 
     Route::get('/clients', [AdminClientsController::class, 'index'])->name('admin.clients');
     Route::post('/clients', [AdminClientsController::class, 'store']);
-    Route::put('/clients/{client}', [AdminClientsController::class, 'update']);
-    Route::delete('/clients/{clients}', [AdminClientsController::class, 'destroy']);
+    Route::put('/clients/{client}', [AdminClientsController::class, 'update'])->name('admin.clients.update');
+    Route::delete('/clients/{client}', [AdminClientsController::class, 'destroy']);
+
 
     Route::get('/contacts', [AdminContactsController::class, 'index'])->name('admin.contacts');
     Route::post('/contacts/{contact}/read', [AdminContactsController::class, 'markAsRead']);

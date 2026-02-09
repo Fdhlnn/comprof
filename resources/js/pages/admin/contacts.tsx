@@ -27,7 +27,7 @@ export default function AdminContacts({ messages, filters }: any) {
         }
     };
 
-    // 🔥 DIRECT OPEN GMAIL WEB
+
     const replyViaGmail = (item: ContactMessage) => {
         const subject = encodeURIComponent('Re: Contact from Faith Industries');
 
@@ -35,7 +35,7 @@ export default function AdminContacts({ messages, filters }: any) {
             `Hi ${item.name},\n\n` +
                 `Terima kasih sudah menghubungi Faith Industries.\n\n` +
                 `------------------------------\n` +
-                `Pesan Anda:\n"${item.message}"\n\n` +
+                `Pesan:\n"${item.message}"\n\n` +
                 `Best regards,\n` +
                 `Faith Industries`,
         );
