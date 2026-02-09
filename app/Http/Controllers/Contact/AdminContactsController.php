@@ -48,18 +48,18 @@ class AdminContactsController extends Controller
 
     public function reply(Request $request, Contacts $contact)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email',
+        $data = $request->validate([
+            'subject' => 'required|string',
             'message' => 'required|string',
         ]);
 
-
-        Mail::raw($request->message, function ($mail) use ($request) {
-            $mail->to($request->email)
-                ->subject('Reply from Faith Industries');
+        Mail::raw($data['message'], function ($mail) use ($contact, $data) {
+            $mail->to($contact->email)
+                ->subject($data['subject']);
         });
 
-        return back()->with('success', 'Reply sent successfully!');
+        $contact->update(['read' => true]);
+
+        return back();
     }
 }

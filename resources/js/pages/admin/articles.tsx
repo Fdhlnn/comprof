@@ -62,6 +62,9 @@ export default function Articles({ articles }: { articles: Article[] }) {
         if (editing) {
             post(`/admin/articles/${editing.id}`, {
                 forceFormData: true,
+                data: {
+                    _method: 'put', 
+                },
                 onSuccess: () => setOpen(false),
             });
         } else {
@@ -71,6 +74,7 @@ export default function Articles({ articles }: { articles: Article[] }) {
             });
         }
     };
+
 
     const remove = (id: number) => {
         if (!confirm('Hapus artikel ini?')) return;

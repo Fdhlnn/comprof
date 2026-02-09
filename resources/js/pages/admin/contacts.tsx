@@ -1,8 +1,18 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { CheckCircle, Mail, Send, Trash2, User } from 'lucide-react';
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 
 interface ContactMessage {
@@ -17,9 +27,11 @@ interface ContactMessage {
 export default function AdminContacts({ messages, filters }: any) {
     const { unreadCount } = usePage().props as any;
 
+
     const markAsRead = (id: number) => {
         router.post(`/admin/contacts/${id}/read`);
     };
+
 
     const deleteMessage = (id: number) => {
         if (confirm('Hapus pesan ini?')) {
@@ -28,30 +40,43 @@ export default function AdminContacts({ messages, filters }: any) {
     };
 
 
-    const replyViaGmail = (item: ContactMessage) => {
-        const subject = encodeURIComponent('Re: Contact from Faith Industries');
+    const [replyOpen, setReplyOpen] = useState(false);
+    const [replyTarget, setReplyTarget] = useState<ContactMessage | null>(null);
 
-        const body = encodeURIComponent(
-            `Hi ${item.name},\n\n` +
-                `Terima kasih sudah menghubungi Faith Industries.\n\n` +
-                `------------------------------\n` +
-                `Pesan:\n"${item.message}"\n\n` +
-                `Best regards,\n` +
-                `Faith Industries`,
-        );
+    const replyForm = useForm({
+        subject: 'Re: Contact from Faith Industries',
+        message: '',
+    });
 
-        // auto mark as read
+
+    const openReply = (item: ContactMessage) => {
+        setReplyTarget(item);
+
+        replyForm.setData({
+            subject: 'Re: Contact from Faith Industries',
+            message:
+                `Halo ${item.name},\n\n` +
+                `Terima kasih telah menghubungi Faith Industries.\n\n`,
+        });
+
         if (!item.read) {
             markAsRead(item.id);
         }
 
-        const gmailUrl =
-            `https://mail.google.com/mail/?view=cm&fs=1` +
-            `&to=${encodeURIComponent(item.email)}` +
-            `&su=${subject}` +
-            `&body=${body}`;
+        setReplyOpen(true);
+    };
 
-        window.open(gmailUrl, '_blank');
+
+    const sendReply = () => {
+        if (!replyTarget) return;
+
+        replyForm.post(`/admin/contacts/${replyTarget.id}/reply`, {
+            onSuccess: () => {
+                setReplyOpen(false);
+                replyForm.reset();
+                setReplyTarget(null);
+            },
+        });
     };
 
     return (
@@ -59,7 +84,7 @@ export default function AdminContacts({ messages, filters }: any) {
             <Head title="Contact Messages" />
 
             <section className="space-y-6">
-                {/* Header */}
+                {/* HEADER */}
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold">Contact Messages</h1>
@@ -75,7 +100,7 @@ export default function AdminContacts({ messages, filters }: any) {
                     )}
                 </div>
 
-                {/* Search */}
+                {/* SEARCH */}
                 <Input
                     placeholder="Cari nama, email, pesan..."
                     defaultValue={filters.search}
@@ -89,7 +114,7 @@ export default function AdminContacts({ messages, filters }: any) {
                     className="max-w-sm"
                 />
 
-                {/* Messages */}
+                {/* LIST */}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {messages.data.length === 0 && (
                         <p className="text-muted-foreground">
@@ -148,7 +173,7 @@ export default function AdminContacts({ messages, filters }: any) {
 
                                         <Button
                                             size="sm"
-                                            onClick={() => replyViaGmail(item)}
+                                            onClick={() => openReply(item)}
                                         >
                                             <Send className="mr-1 h-4 w-4" />
                                             Reply
@@ -170,7 +195,7 @@ export default function AdminContacts({ messages, filters }: any) {
                     ))}
                 </div>
 
-                {/* Pagination */}
+                {/* PAGINATION */}
                 <div className="flex justify-center gap-2">
                     {messages.links.map((link: any, i: number) => (
                         <Button
@@ -185,6 +210,49 @@ export default function AdminContacts({ messages, filters }: any) {
                     ))}
                 </div>
             </section>
+
+            
+            <Dialog open={replyOpen} onOpenChange={setReplyOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Reply to {replyTarget?.email}</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="space-y-4 py-4">
+                        <Input
+                            placeholder="Subject"
+                            value={replyForm.data.subject}
+                            onChange={(e) =>
+                                replyForm.setData('subject', e.target.value)
+                            }
+                        />
+
+                        <Textarea
+                            rows={8}
+                            placeholder="Message"
+                            value={replyForm.data.message}
+                            onChange={(e) =>
+                                replyForm.setData('message', e.target.value)
+                            }
+                        />
+                    </div>
+
+                    <DialogFooter>
+                        <Button
+                            variant="secondary"
+                            onClick={() => setReplyOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={sendReply}
+                            disabled={replyForm.processing}
+                        >
+                            Send Email
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }

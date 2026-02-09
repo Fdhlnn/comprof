@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -13,11 +14,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Clients', href: '/admin/clients' },
-];
 
 type ClientItem = {
     id: number;
@@ -32,16 +28,10 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
     const [open, setOpen] = useState(false);
     const [editing, setEditing] = useState<ClientItem | null>(null);
 
-    const form = useForm<{
-        name: string;
-        company: string;
-        avatar: File | null;
-        rating: number;
-        message: string;
-    }>({
+    const form = useForm({
         name: '',
         company: '',
-        avatar: null,
+        avatar: null as File | null,
         rating: 5,
         message: '',
     });
@@ -53,10 +43,11 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
     };
 
     const openEdit = (client: ClientItem) => {
+        form.clearErrors();
         setEditing(client);
         form.setData({
             name: client.name,
-            company: client.company || '',
+            company: client.company ?? '',
             avatar: null,
             rating: client.rating,
             message: client.message,
@@ -64,10 +55,14 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
         setOpen(true);
     };
 
+    // 🔥 FIX DI SINI
     const submit = () => {
         if (editing) {
-            form.put(`/admin/clients/${editing.id}`, {
+            form.post(`/admin/clients/${editing.id}`, {
                 forceFormData: true,
+                data: {
+                    _method: 'put',
+                },
                 onSuccess: () => {
                     setOpen(false);
                     form.reset();
@@ -87,101 +82,77 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
 
     const handleDelete = (id: number) => {
         if (!confirm('Hapus client ini?')) return;
-
         form.delete(`/admin/clients/${id}`);
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout>
             <Head title="Clients" />
 
-            <div className="flex flex-col gap-6 p-4">
+            <div className="space-y-6 p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Clients</h1>
                     <Button onClick={openCreate}>Add Client</Button>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border">
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted">
-                            <tr>
-                                <th className="px-4 py-3 text-left">Avatar</th>
-                                <th className="px-4 py-3 text-left">Name</th>
-                                <th className="px-4 py-3 text-left">Company</th>
-                                <th className="px-4 py-3 text-left">Rating</th>
-                                <th className="px-4 py-3 text-left">Message</th>
-                                <th className="px-4 py-3 text-left">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {clients.length === 0 && (
-                                <tr>
-                                    <td
-                                        colSpan={6}
-                                        className="px-4 py-6 text-center text-muted-foreground"
-                                    >
-                                        No clients
-                                    </td>
-                                </tr>
-                            )}
-
-                            {clients.map((clients) => (
-                                <tr key={clients.id} className="border-t">
-                                    <td className="px-4 py-3">
-                                        {clients.avatar ? (
-                                            <img
-                                                src={`/storage/${clients.avatar}`}
-                                                className="h-12 w-12 rounded-full object-cover"
-                                            />
-                                        ) : (
-                                            <span className="text-muted-foreground">
-                                                No Avatar
-                                            </span>
-                                        )}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        {clients.name}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        {clients.company}
-                                    </td>
-                                    <td className="flex gap-1 px-4 py-3">
-                                        {Array.from({
-                                            length: clients.rating,
-                                        }).map((_, i) => (
+                <table className="w-full rounded border">
+                    <thead>
+                        <tr className="bg-muted">
+                            <th className="p-3">Avatar</th>
+                            <th className="p-3">Name</th>
+                            <th className="p-3">Company</th>
+                            <th className="p-3">Rating</th>
+                            <th className="p-3">Message</th>
+                            <th className="p-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {clients.map((client) => (
+                            <tr key={client.id} className="border-t">
+                                <td className="p-3">
+                                    {client.avatar ? (
+                                        <img
+                                            src={`/storage/${client.avatar}`}
+                                            className="h-12 w-12 rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        '—'
+                                    )}
+                                </td>
+                                <td className="p-3">{client.name}</td>
+                                <td className="p-3">{client.company}</td>
+                                <td className="flex gap-1 p-3">
+                                    {Array.from({ length: client.rating }).map(
+                                        (_, i) => (
                                             <Star
                                                 key={i}
                                                 size={16}
                                                 className="fill-yellow-400 text-yellow-400"
                                             />
-                                        ))}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        {clients.message}
-                                    </td>
-                                    <td className="flex gap-2 px-4 py-3">
-                                        <Button
-                                            size="sm"
-                                            variant="secondary"
-                                            onClick={() => openEdit(clients)}
-                                        >
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="destructive"
-                                            onClick={() =>
-                                                handleDelete(clients.id)
-                                            }
-                                        >
-                                            Delete
-                                        </Button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                                        ),
+                                    )}
+                                </td>
+                                <td className="p-3">{client.message}</td>
+                                <td className="flex gap-2 p-3">
+                                    <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        onClick={() => openEdit(client)}
+                                    >
+                                        Edit
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        onClick={() => handleDelete(client.id)}
+                                    >
+                                        Delete
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
 
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogContent>
@@ -189,9 +160,12 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
                             <DialogTitle>
                                 {editing ? 'Edit Client' : 'Add Client'}
                             </DialogTitle>
+                            <DialogDescription>
+                                Kelola data client
+                            </DialogDescription>
                         </DialogHeader>
 
-                        <div className="grid gap-4 py-4">
+                        <div className="space-y-3">
                             <Input
                                 placeholder="Name"
                                 value={form.data.name}
@@ -199,7 +173,6 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
                                     form.setData('name', e.target.value)
                                 }
                             />
-
                             <Input
                                 placeholder="Company"
                                 value={form.data.company}
@@ -211,15 +184,14 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
                                 type="number"
                                 min={1}
                                 max={5}
-                                value={form.data.rating || ''}
-                                onChange={(e) => {
-                                    const value = Number(e.target.value);
-                                    if (value >= 1 && value <= 5) {
-                                        form.setData('rating', value);
-                                    }
-                                }}
+                                value={form.data.rating}
+                                onChange={(e) =>
+                                    form.setData(
+                                        'rating',
+                                        Number(e.target.value),
+                                    )
+                                }
                             />
-
                             <Textarea
                                 placeholder="Message"
                                 value={form.data.message}
@@ -227,38 +199,26 @@ export default function Clients({ clients }: { clients: ClientItem[] }) {
                                     form.setData('message', e.target.value)
                                 }
                             />
-
                             <Input
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) =>
                                     form.setData(
                                         'avatar',
-                                        e.target.files?.[0] || null,
+                                        e.target.files?.[0] ?? null,
                                     )
                                 }
                             />
-
-                            {form.data.avatar && (
-                                <img
-                                    src={URL.createObjectURL(form.data.avatar)}
-                                    className="h-32 w-full rounded object-cover"
-                                />
-                            )}
                         </div>
 
                         <DialogFooter>
                             <Button
                                 variant="secondary"
-                                onClick={() => {
-                                    setOpen(false);
-                                    form.reset();
-                                    setEditing(null);
-                                }}
+                                onClick={() => setOpen(false)}
                             >
                                 Cancel
                             </Button>
-                            <Button onClick={submit}>
+                            <Button onClick={submit} disabled={form.processing}>
                                 {editing ? 'Update' : 'Save'}
                             </Button>
                         </DialogFooter>

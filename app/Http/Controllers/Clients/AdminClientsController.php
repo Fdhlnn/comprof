@@ -47,17 +47,21 @@ class AdminClientsController extends Controller
         ]);
 
         if ($request->hasFile('avatar')) {
+
             if ($client->avatar) {
                 Storage::disk('public')->delete($client->avatar);
             }
 
             $data['avatar'] = $request->file('avatar')->store('clients', 'public');
+        } else {
+            unset($data['avatar']);
         }
 
         $client->update($data);
 
         return redirect()->back();
     }
+
 
 
     public function destroy(Clients $client)

@@ -56,21 +56,25 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/articles', [AdminArticlesController::class, 'index'])->name('admin.articles');
     Route::post('/articles', [AdminArticlesController::class, 'store']);
     Route::put('/articles/{article}', [AdminArticlesController::class, 'update']);
+    Route::post('/articles/{article}', [AdminArticlesController::class, 'update']);
     Route::delete('/articles/{article}', [AdminArticlesController::class, 'destroy']);
 
     Route::get('/gallery', [AdminGalleryController::class, 'index'])->name('admin.gallery');
     Route::post('/gallery', [AdminGalleryController::class, 'store']);
     Route::put('/gallery/{gallery}', [AdminGalleryController::class, 'update']);
+    Route::post('/gallery/{gallery}', [AdminGalleryController::class, 'update']);
     Route::delete('/gallery/{gallery}', [AdminGalleryController::class, 'destroy']);
 
     Route::get('/events', [AdminEventsController::class, 'index'])->name('admin.events');
     Route::post('/events', [AdminEventsController::class, 'store']);
     Route::put('/events/{events}', [AdminEventsController::class, 'update']);
+    Route::post('/events/{events}', [AdminEventsController::class, 'update']);
     Route::delete('/events/{events}', [AdminEventsController::class, 'destroy']);
 
     Route::get('/clients', [AdminClientsController::class, 'index'])->name('admin.clients');
     Route::post('/clients', [AdminClientsController::class, 'store']);
-    Route::put('/clients/{client}', [AdminClientsController::class, 'update'])->name('admin.clients.update');
+    Route::put('/clients/{client}', [AdminClientsController::class, 'update']);
+    Route::post('/clients/{client}', [AdminClientsController::class, 'update']);
     Route::delete('/clients/{client}', [AdminClientsController::class, 'destroy']);
 
 

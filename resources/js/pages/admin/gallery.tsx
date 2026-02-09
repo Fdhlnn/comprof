@@ -54,26 +54,32 @@ export default function Gallery({ gallery }: { gallery: GalleryItem[] }) {
     };
 
     const submit = () => {
+        const formData = new FormData();
+        formData.append('title', data.title);
+        if (data.image) formData.append('image', data.image);
+
         if (editing) {
-            // Laravel expects _method=PUT for update
-            const formData = new FormData();
-            formData.append('title', data.title);
-            if (data.image) formData.append('image', data.image);
             formData.append('_method', 'PUT');
 
-            put(`/admin/gallery/${editing.id}`, formData, {
-                onSuccess: () => setOpen(false),
+            post(`/admin/gallery/${editing.id}`, formData, {
+                forceFormData: true,
+                onSuccess: () => {
+                    setOpen(false);
+                    reset();
+                    setEditing(null);
+                },
             });
         } else {
-            const formData = new FormData();
-            formData.append('title', data.title);
-            if (data.image) formData.append('image', data.image);
-
             post('/admin/gallery', formData, {
-                onSuccess: () => setOpen(false),
+                forceFormData: true,
+                onSuccess: () => {
+                    setOpen(false);
+                    reset();
+                },
             });
         }
     };
+
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

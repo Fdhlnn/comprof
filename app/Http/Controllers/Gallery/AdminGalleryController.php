@@ -33,13 +33,21 @@ class AdminGalleryController extends Controller
     public function update(Request $request, Gallery $gallery)
     {
         $data = $request->validate([
-            'title'  => 'required|string',
+            'title' => 'required|string',
             'image' => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
-            Storage::disk('public')->delete($gallery->image);
+
+
+            if ($gallery->image) {
+                Storage::disk('public')->delete($gallery->image);
+            }
+
             $data['image'] = $request->file('image')->store('gallery', 'public');
+        } else {
+
+            unset($data['image']);
         }
 
         $gallery->update($data);
@@ -47,9 +55,13 @@ class AdminGalleryController extends Controller
         return back();
     }
 
+
     public function destroy(Gallery $gallery)
     {
-        Storage::disk('public')->delete($gallery->image);
+        if ($gallery->image) {
+            Storage::disk('public')->delete($gallery->image);
+        }
+
         $gallery->delete();
 
         return back();

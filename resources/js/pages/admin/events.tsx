@@ -82,12 +82,14 @@ export default function Event({ events }: { events: EventItem[] }) {
         formData.append('start_date', data.start_date);
         formData.append('end_date', data.end_date);
         formData.append('location', data.location);
+        formData.append('status', data.status);
         if (data.image) formData.append('image', data.image);
 
         if (editing) {
             formData.append('_method', 'PUT');
-            put(`/admin/events/${editing.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+
+            post(`/admin/events/${editing.id}`, formData, {
+                forceFormData: true,
                 onSuccess: () => {
                     setOpen(false);
                     reset();
@@ -96,7 +98,7 @@ export default function Event({ events }: { events: EventItem[] }) {
             });
         } else {
             post('/admin/events', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+                forceFormData: true,
                 onSuccess: () => {
                     setOpen(false);
                     reset();
@@ -104,6 +106,7 @@ export default function Event({ events }: { events: EventItem[] }) {
             });
         }
     };
+
 
     const handleDelete = (id: number) => {
         if (!confirm('Hapus event ini?')) return;

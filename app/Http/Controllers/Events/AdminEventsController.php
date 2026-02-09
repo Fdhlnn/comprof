@@ -33,7 +33,10 @@ class AdminEventsController extends Controller
         $now = Carbon::now();
         if ($now->lt(Carbon::parse($data['start_date']))) {
             $data['status'] = 'upcoming';
-        } elseif ($now->between(Carbon::parse($data['start_date']), Carbon::parse($data['end_date']))) {
+        } elseif ($now->between(
+            Carbon::parse($data['start_date']),
+            Carbon::parse($data['end_date'])
+        )) {
             $data['status'] = 'ongoing';
         } else {
             $data['status'] = 'past';
@@ -63,17 +66,26 @@ class AdminEventsController extends Controller
         $now = Carbon::now();
         if ($now->lt(Carbon::parse($data['start_date']))) {
             $data['status'] = 'upcoming';
-        } elseif ($now->between(Carbon::parse($data['start_date']), Carbon::parse($data['end_date']))) {
+        } elseif ($now->between(
+            Carbon::parse($data['start_date']),
+            Carbon::parse($data['end_date'])
+        )) {
             $data['status'] = 'ongoing';
         } else {
             $data['status'] = 'past';
         }
 
         if ($request->hasFile('image')) {
-            Storage::disk('public')->delete($events->image);
+            if ($events->image) {
+                Storage::disk('public')->delete($events->image);
+            }
+
             $data['image'] = $request->file('image')->store('events', 'public');
+        } else {
+            unset($data['image']);
         }
 
+        
         $events->update($data);
 
         return redirect()->route('admin.events');
@@ -81,7 +93,10 @@ class AdminEventsController extends Controller
 
     public function destroy(Events $events)
     {
-        Storage::disk('public')->delete($events->image);
+        if ($events->image) {
+            Storage::disk('public')->delete($events->image);
+        }
+
         $events->delete();
 
         return redirect()->route('admin.events');

@@ -43,10 +43,15 @@ class AdminArticlesController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
+
             if ($article->image) {
                 Storage::disk('public')->delete($article->image);
             }
+
             $data['image'] = $request->file('image')->store('articles', 'public');
+        } else {
+            
+            unset($data['image']);
         }
 
         $article->update($data);
