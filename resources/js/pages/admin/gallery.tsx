@@ -1,4 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -10,7 +11,6 @@ import {
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { useState } from 'react';
 
 type GalleryItem = {
     id: number;
@@ -30,12 +30,15 @@ export default function Gallery({ gallery }: { gallery: GalleryItem[] }) {
         data,
         setData,
         post,
-        put,
         delete: destroy,
         reset,
-    } = useForm({
+    } = useForm<{
+        title: string;
+        image: File | null;
+        _method?: string;
+    }>({
         title: '',
-        image: null as File | null,
+        image: null,
     });
 
     const openCreate = () => {
@@ -49,19 +52,14 @@ export default function Gallery({ gallery }: { gallery: GalleryItem[] }) {
         setData({
             title: item.title,
             image: null,
+            _method: 'PUT',
         });
         setOpen(true);
     };
 
     const submit = () => {
-        const formData = new FormData();
-        formData.append('title', data.title);
-        if (data.image) formData.append('image', data.image);
-
         if (editing) {
-            formData.append('_method', 'PUT');
-
-            post(`/admin/gallery/${editing.id}`, formData, {
+            post(`/admin/gallery/${editing.id}`, {
                 forceFormData: true,
                 onSuccess: () => {
                     setOpen(false);
@@ -70,7 +68,7 @@ export default function Gallery({ gallery }: { gallery: GalleryItem[] }) {
                 },
             });
         } else {
-            post('/admin/gallery', formData, {
+            post('/admin/gallery', {
                 forceFormData: true,
                 onSuccess: () => {
                     setOpen(false);
@@ -79,7 +77,6 @@ export default function Gallery({ gallery }: { gallery: GalleryItem[] }) {
             });
         }
     };
-
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -93,6 +90,7 @@ export default function Gallery({ gallery }: { gallery: GalleryItem[] }) {
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
                     {gallery.length === 0 && <p>Belum ada gambar</p>}
+
                     {gallery.map((item) => (
                         <div
                             key={item.id}
@@ -103,10 +101,12 @@ export default function Gallery({ gallery }: { gallery: GalleryItem[] }) {
                                 alt={item.title}
                                 className="h-48 w-full object-cover"
                             />
-                            <div className="flex justify-between p-4">
+
+                            <div className="flex items-center justify-between p-4">
                                 <span className="font-semibold">
                                     {item.title}
                                 </span>
+
                                 <div className="flex gap-2">
                                     <Button
                                         size="sm"
@@ -115,11 +115,17 @@ export default function Gallery({ gallery }: { gallery: GalleryItem[] }) {
                                     >
                                         Edit
                                     </Button>
+
                                     <Button
                                         size="sm"
                                         variant="destructive"
                                         onClick={() =>
-                                            destroy(`/admin/gallery/${item.id}`)
+                                            destroy(
+                                                `/admin/gallery/${item.id}`,
+                                                {
+                                                    onSuccess: () => reset(),
+                                                },
+                                            )
                                         }
                                     >
                                         Delete
@@ -147,6 +153,7 @@ export default function Gallery({ gallery }: { gallery: GalleryItem[] }) {
                                     setData('title', e.target.value)
                                 }
                             />
+
                             <Input
                                 type="file"
                                 accept="image/*"

@@ -1,9 +1,11 @@
-import { Head, router, usePage } from '@inertiajs/react';
+
+import { Head, router, usePage, } from '@inertiajs/react';
 import { CheckCircle, Mail, Send, Trash2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
+
 
 interface ContactMessage {
     id: number;
@@ -14,8 +16,39 @@ interface ContactMessage {
     created_at: string;
 }
 
-export default function AdminContacts({ messages, filters }: any) {
-    const { unreadCount } = usePage().props as any;
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+interface PaginatedMessages {
+    data: ContactMessage[];
+    links: PaginationLink[];
+}
+
+interface Filters {
+    search?: string;
+}
+
+interface PageProps {
+    unreadCount: number;
+}
+
+interface AdminContactsProps {
+    messages: PaginatedMessages;
+    filters: Filters;
+}
+
+/* =======================
+   Component
+======================= */
+
+export default function AdminContacts({
+    messages,
+    filters,
+}: AdminContactsProps) {
+    const { unreadCount } = usePage<PageProps>().props;
 
     const markAsRead = (id: number) => {
         router.post(`/admin/contacts/${id}/read`);
@@ -27,19 +60,19 @@ export default function AdminContacts({ messages, filters }: any) {
         }
     };
 
-
     const replyViaGmail = (item: ContactMessage) => {
         const subject = encodeURIComponent('Re: Contact from Faith Industries');
 
         const body = encodeURIComponent(
             `Halo ${item.name},\n\n` +
                 `Terima kasih telah menghubungi kami.\n\n` +
-                `\n\n` +
                 `Jika masih ada pertanyaan, jangan ragu untuk membalas email ini.\n\n` +
                 `Hormat kami,\n` +
                 `Customer Service, Faith Industries\n\n` +
                 `----------------------------------\n` +
-                `Pada ${new Date(item.created_at).toLocaleDateString('id-ID')}, ${item.name} <${item.email}> menulis:\n\n` +
+                `Pada ${new Date(item.created_at).toLocaleDateString(
+                    'id-ID',
+                )}, ${item.name} <${item.email}> menulis:\n\n` +
                 `Pesan:\n"${item.message}"`,
         );
 
@@ -55,7 +88,6 @@ export default function AdminContacts({ messages, filters }: any) {
 
         window.open(gmailUrl, '_blank');
     };
-
 
     return (
         <AppLayout>
@@ -100,7 +132,7 @@ export default function AdminContacts({ messages, filters }: any) {
                         </p>
                     )}
 
-                    {messages.data.map((item: ContactMessage) => (
+                    {messages.data.map((item) => (
                         <Card
                             key={item.id}
                             className={`relative ${
@@ -175,7 +207,7 @@ export default function AdminContacts({ messages, filters }: any) {
 
                 {/* Pagination */}
                 <div className="flex justify-center gap-2">
-                    {messages.links.map((link: any, i: number) => (
+                    {messages.links.map((link, i) => (
                         <Button
                             key={i}
                             variant={link.active ? 'default' : 'outline'}
